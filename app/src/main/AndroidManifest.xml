@@ -16,7 +16,7 @@
         <!-- Enable Android Things -->
         <uses-library android:name="com.google.android.things"/>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <!-- Launch activity as default from Android Studio -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
