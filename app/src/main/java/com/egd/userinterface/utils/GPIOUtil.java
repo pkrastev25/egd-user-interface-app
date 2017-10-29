@@ -1,8 +1,8 @@
 package com.egd.userinterface.utils;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.egd.userinterface.constants.enums.GPIOActiveTypes;
 import com.egd.userinterface.constants.enums.RaspberryPiGPIOPorts;
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
@@ -22,22 +22,23 @@ public class GPIOUtil {
     private static final String TAG = GPIOUtil.class.getSimpleName();
 
     /**
-     * Configures a GPIO according to the specifications.
+     * Configures a GPIO as an input according to the specifications.
      *
      * @param pinName Name of the GPIO port, must be one of type {@link RaspberryPiGPIOPorts}
-     * @param activeType Sets Low or High voltage to the port, must be one of type {@link GPIOActiveTypes}
-     * @return Configured {@link Gpio}
+     * @param isHighActiveType If true, the active type of the GPIO will be set to {@link Gpio#ACTIVE_HIGH}, false otherwise, {@link Gpio#ACTIVE_LOW}
+     * @return Configured {@link Gpio}, null if the configuration failed
      */
-    public static Gpio configureInputGPIO(@RaspberryPiGPIOPorts String pinName, @GPIOActiveTypes int activeType) {
+    @Nullable
+    public static Gpio configureInputGPIO(@RaspberryPiGPIOPorts String pinName, boolean isHighActiveType) {
         Gpio gpio = null;
 
         try {
             PeripheralManagerService service = new PeripheralManagerService();
             gpio = service.openGpio(pinName);
             gpio.setDirection(Gpio.DIRECTION_IN);
-            gpio.setActiveType(activeType);
+            gpio.setActiveType(isHighActiveType ? Gpio.ACTIVE_HIGH : Gpio.ACTIVE_LOW);
         } catch (Exception e) {
-            Log.d(TAG, "GPIO config failed");
+            Log.e(TAG, "GPIOUtil.configureInputGPIO() failed!");
             e.printStackTrace();
         }
 
@@ -45,23 +46,24 @@ public class GPIOUtil {
     }
 
     /**
-     * Configures a GPIO according to the specifications.
+     * Configures a GPIO as an output according to the specifications.
      *
      * @param pinName Name of the GPIO port, must be one of type {@link RaspberryPiGPIOPorts}
-     * @param isInitiallyHigh If true, it will set {@link Gpio#DIRECTION_OUT_INITIALLY_HIGH}, false otherwise, {@link Gpio#DIRECTION_OUT_INITIALLY_LOW}
-     * @param activeType Sets Low or High voltage to the port, must be one of type {@link GPIOActiveTypes}
-     * @return Configured {@link Gpio}
+     * @param isInitiallyHigh If true, the GPIO will have an initial value of high, {@link Gpio#DIRECTION_OUT_INITIALLY_HIGH}, false otherwise, {@link Gpio#DIRECTION_OUT_INITIALLY_LOW}
+     * @param isHighActiveType If true, the active type of the GPIO will be set to {@link Gpio#ACTIVE_HIGH}, false otherwise, {@link Gpio#ACTIVE_LOW}
+     * @return Configured {@link Gpio}, null if the configuration failed
      */
-    public static Gpio configureOutputGPIO(@RaspberryPiGPIOPorts String pinName, boolean isInitiallyHigh, @GPIOActiveTypes int activeType) {
+    @Nullable
+    public static Gpio configureOutputGPIO(@RaspberryPiGPIOPorts String pinName, boolean isInitiallyHigh, boolean isHighActiveType) {
         Gpio gpio = null;
 
         try {
             PeripheralManagerService service = new PeripheralManagerService();
             gpio = service.openGpio(pinName);
             gpio.setDirection(isInitiallyHigh ? Gpio.DIRECTION_OUT_INITIALLY_HIGH : Gpio.DIRECTION_OUT_INITIALLY_LOW);
-            gpio.setActiveType(activeType);
+            gpio.setActiveType(isHighActiveType ? Gpio.ACTIVE_HIGH : Gpio.ACTIVE_LOW);
         } catch (Exception e) {
-            Log.d(TAG, "GPIO config failed");
+            Log.e(TAG, "GPIOUtil.configureOutputGPIO() failed!");
             e.printStackTrace();
         }
 
