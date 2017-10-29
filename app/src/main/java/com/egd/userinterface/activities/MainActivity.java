@@ -15,6 +15,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //TestCases.GPIOUtilOutputTest();
     }
 
     @Override
@@ -22,5 +24,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         //TestCases.TextToSpeechControllerTest();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //TestCases.closeGPIOPorts();
     }
 }
