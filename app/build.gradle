@@ -36,4 +36,14 @@ dependencies {
 
     // Enable Android Things
     provided 'com.google.android.things:androidthings:0.5.1-devpreview'
+
+    // Speech to text
+    compile project(':pocketsphinx')
 }
+
+/*
+ * Generate binaries for the assets directory of this project
+ */
+ant.importBuild 'assets.xml'
+preBuild.dependsOn(list, checksum)
+clean.dependsOn(clean_assets)

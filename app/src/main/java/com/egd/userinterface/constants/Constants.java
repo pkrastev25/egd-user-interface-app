@@ -86,4 +86,18 @@ public class Constants {
     // --------------------------------------------------------------
     // End of MOTOR region
     // --------------------------------------------------------------
+
+    // --------------------------------------------------------------
+    // SPEECH TO TEXT CONTROLLER region
+    // --------------------------------------------------------------
+
+    /**
+     * Specifies the timeout for the speech recognition. After the specified time,
+     * the speech recognition will not working.
+     */
+    public static final int SPEECH_TO_TEXT_TIMEOUT = 10_000;
+
+    // --------------------------------------------------------------
+    // End of SPEECH TO TEXT CONTROLLER region
+    // --------------------------------------------------------------
 }
