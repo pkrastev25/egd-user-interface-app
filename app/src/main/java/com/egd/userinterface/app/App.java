@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MotorController;
+import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
 
 /**
@@ -23,5 +24,6 @@ public class App extends Application {
         LEDController.initialize();
         MotorController.initialize();
         TextToSpeechController.initialize(this);
+        SpeechToTextController.initialize(this);
     }
 }
