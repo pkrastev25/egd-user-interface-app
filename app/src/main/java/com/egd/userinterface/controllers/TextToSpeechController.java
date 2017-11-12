@@ -5,6 +5,7 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
+import com.egd.userinterface.controllers.models.ITextToSpeechController;
 
 import java.util.LinkedList;
 import java.util.Locale;
@@ -17,7 +18,7 @@ import java.util.Queue;
  * @author Petar Krastev
  * @since 28.10.2017
  */
-public class TextToSpeechController {
+public class TextToSpeechController implements ITextToSpeechController {
 
     /**
      * Represents the class name, used only for debugging.
@@ -28,6 +29,7 @@ public class TextToSpeechController {
      * Unique identifier, used only by {@link TextToSpeechController#speak(String)}.
      */
     private static final String UTTERANCE_ID = "UTTERANCE_ID";
+    private static ITextToSpeechController sInstance;
 
     /**
      * Used to store the text of all pending
@@ -40,7 +42,6 @@ public class TextToSpeechController {
      * initialized.
      */
     private boolean mIsInitialized;
-    private static TextToSpeechController sInstance;
     private TextToSpeech mTextToSpeech;
 
     /**
@@ -81,12 +82,14 @@ public class TextToSpeechController {
      * @param context {@link Context} reference
      */
     public static void initialize(Context context) {
-        sInstance = new TextToSpeechController(
-                context,
-                Constants.TEXT_TO_SPEECH_DEFAULT_LANGUAGE,
-                Constants.TEXT_TO_SPEECH_DEFAULT_PITCH,
-                Constants.TEXT_TO_SPEECH_DEFAULT_SPEECH_RATE
-        );
+        if (sInstance == null) {
+            sInstance = new TextToSpeechController(
+                    context,
+                    Constants.TEXT_TO_SPEECH_DEFAULT_LANGUAGE,
+                    Constants.TEXT_TO_SPEECH_DEFAULT_PITCH,
+                    Constants.TEXT_TO_SPEECH_DEFAULT_SPEECH_RATE
+            );
+        }
     }
 
     /**
@@ -95,22 +98,12 @@ public class TextToSpeechController {
      * @return The {@link TextToSpeechController} instance
      * @throws RuntimeException If {@link TextToSpeechController#initialize(Context)} is not called before this method
      */
-    public static TextToSpeechController getInstance() {
+    public static ITextToSpeechController getInstance() {
         if (sInstance == null) {
             throw new RuntimeException("You must call TextToSpeechController.initialize() first!");
         }
 
         return sInstance;
-    }
-
-    /**
-     * Executes all pending {@link TextToSpeechController#speak(String)}
-     * operations, if there are any.
-     */
-    private void executePendingOperations() {
-        while (!mPendingOperations.isEmpty()) {
-            speak(mPendingOperations.remove());
-        }
     }
 
     /**
@@ -122,6 +115,7 @@ public class TextToSpeechController {
      *
      * @param output Text to be read for the user
      */
+    @Override
     public void speak(String output) {
         if (mIsInitialized) {
             int result = mTextToSpeech.speak(output, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID);
@@ -139,7 +133,8 @@ public class TextToSpeechController {
      * Releases all resources held by the {@link TextToSpeechController}
      * class.
      */
-    public void clear() {
+    @Override
+    public void clean() {
         if (mTextToSpeech != null) {
             mTextToSpeech.shutdown();
             mTextToSpeech = null;
@@ -148,5 +143,15 @@ public class TextToSpeechController {
         sInstance = null;
         mIsInitialized = false;
         mPendingOperations = null;
+    }
+
+    /**
+     * Executes all pending {@link TextToSpeechController#speak(String)}
+     * operations, if there are any.
+     */
+    private void executePendingOperations() {
+        while (!mPendingOperations.isEmpty()) {
+            speak(mPendingOperations.remove());
+        }
     }
 }
