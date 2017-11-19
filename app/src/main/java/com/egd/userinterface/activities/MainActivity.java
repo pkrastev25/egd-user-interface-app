@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.egd.userinterface.R;
 import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MotorController;
+import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
 import com.egd.userinterface.tests.TestCases;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         TestCases.LEDControllerTest();
         TestCases.MotorControllerTest();
         TestCases.TextToSpeechControllerTest();
+        TestCases.SpeechToTextControllerTest();
     }
 
     @Override
@@ -36,5 +38,6 @@ public class MainActivity extends AppCompatActivity {
         LEDController.getInstance().clean();
         MotorController.getInstance().clean();
         TextToSpeechController.getInstance().clean();
+        SpeechToTextController.getInstance().clean();
     }
 }
