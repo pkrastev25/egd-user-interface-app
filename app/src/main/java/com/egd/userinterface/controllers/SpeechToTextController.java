@@ -5,9 +5,15 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
+import com.egd.userinterface.constants.enums.GPIOEdgeTriggerType;
+import com.egd.userinterface.controllers.models.ISpeechToTextController;
 import com.egd.userinterface.utils.AsyncTaskUtil;
+import com.egd.userinterface.utils.GPIOUtil;
+import com.google.android.things.pio.Gpio;
+import com.google.android.things.pio.GpioCallback;
 
 import java.io.File;
+import java.io.IOException;
 
 import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
@@ -22,7 +28,7 @@ import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
  * @author Petar Krastev
  * @since 5.11.2017
  */
-public class SpeechToTextController {
+public class SpeechToTextController implements ISpeechToTextController {
 
     /**
      * Represents the class name, used only for debugging.
@@ -42,17 +48,42 @@ public class SpeechToTextController {
      * recognizer for what should he search.
      */
     private static final String GRAMMAR_OPTIONS = "GRAMMAR_OPTIONS";
-    private static SpeechToTextController sInstance;
+    private static ISpeechToTextController sInstance;
 
     private SpeechRecognizer mSpeechRecognizer;
+    private Gpio mInput;
+    private GpioCallback mInputCallback;
 
     /**
      * Initializes the {@link SpeechRecognizer} by settings the acoustic model,
-     * dictionary and language model of the English language.
+     * dictionary and language model of the English language. Configures a pin
+     * as input according to {@link Constants#SPEECH_TO_TEXT_INPUT}.
      *
      * @param context {@link Context} reference
      */
     private SpeechToTextController(final Context context) {
+        mInputCallback = new GpioCallback() {
+            @Override
+            public boolean onGpioEdge(Gpio gpio) {
+                recognizeSpeech();
+
+                return true;
+            }
+
+            @Override
+            public void onGpioError(Gpio gpio, int error) {
+                Log.e(TAG, "GpioCallback.onGpioError() called!");
+                super.onGpioError(gpio, error);
+            }
+        };
+
+        mInput = GPIOUtil.configureInputGPIO(
+                Constants.SPEECH_TO_TEXT_INPUT,
+                true,
+                GPIOEdgeTriggerType.EDGE_RISING,
+                mInputCallback
+        );
+
         AsyncTaskUtil.doInBackground(new AsyncTaskUtil.IAsyncTaskListener<SpeechRecognizer>() {
             @Override
             public SpeechRecognizer onExecuteTask() throws Exception {
@@ -118,7 +149,7 @@ public class SpeechToTextController {
      * @return The {@link SpeechToTextController} instance
      * @throws RuntimeException If {@link SpeechToTextController#initialize(Context)} is not called before this method
      */
-    public static SpeechToTextController getInstance() {
+    public static ISpeechToTextController getInstance() {
         if (sInstance == null) {
             throw new RuntimeException("You must call SpeechToTextController.initialize() first!");
         }
@@ -130,6 +161,7 @@ public class SpeechToTextController {
      * Attempts to convert the speech input by the user into an equivalent
      * text format.
      */
+    @Override
     public void recognizeSpeech() {
         mSpeechRecognizer.startListening(GRAMMAR_OPTIONS, Constants.SPEECH_TO_TEXT_TIMEOUT);
     }
@@ -138,13 +170,23 @@ public class SpeechToTextController {
      * Releases all resources held by the {@link SpeechToTextController}
      * class.
      */
-    public void clear() {
+    @Override
+    public void clean() {
         if (mSpeechRecognizer != null) {
             mSpeechRecognizer.cancel();
             mSpeechRecognizer.shutdown();
             mSpeechRecognizer = null;
         }
 
+        try {
+            mInput.unregisterGpioCallback(mInputCallback);
+            mInput.close();
+        } catch (IOException e) {
+            Log.e(TAG, "SpeechToTextController.clean() failed!", e);
+        }
+
+        mInputCallback = null;
+        mInput = null;
         sInstance = null;
     }
 

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MotorController;
+import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
 
 import java.util.concurrent.TimeUnit;
@@ -49,7 +50,7 @@ public class TestCases {
     }
 
     /**
-     * Simple test case for the {@link MotorController}. Starts the controller
+     * Simple test case for the {@link MotorController}. Starts the motor
      * and stops it after 1 second.
      */
     public static void MotorControllerTest() {
@@ -62,5 +63,14 @@ public class TestCases {
                 Log.i(TAG, "TestCases.MotorControllerTest() last call");
             }
         }, TimeUnit.MINUTES.toMillis(1));
+    }
+
+    /**
+     * Simple test case for the {@link SpeechToTextController}. Triggers a speech
+     * recognition and forwards the result to the {@link TextToSpeechController}.
+     */
+    public static void SpeechToTextControllerTest() {
+        Log.i(TAG, "TestCases.SpeechToTextControllerTest() call");
+        SpeechToTextController.getInstance().recognizeSpeech();
     }
 }

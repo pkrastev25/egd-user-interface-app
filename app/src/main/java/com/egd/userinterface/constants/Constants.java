@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class Constants {
 
     // --------------------------------------------------------------
-    // TEXT TO SPEECH CONTROLLER region
+    // TEXT TO SPEECH region
     // --------------------------------------------------------------
 
     /**
@@ -33,7 +33,7 @@ public class Constants {
     public static final float TEXT_TO_SPEECH_DEFAULT_SPEECH_RATE = 1f;
 
     // --------------------------------------------------------------
-    // End of TEXT TO SPEECH CONTROLLER region
+    // End of TEXT TO SPEECH region
     // --------------------------------------------------------------
 
     // --------------------------------------------------------------
@@ -88,8 +88,14 @@ public class Constants {
     // --------------------------------------------------------------
 
     // --------------------------------------------------------------
-    // SPEECH TO TEXT CONTROLLER region
+    // SPEECH TO TEXT region
     // --------------------------------------------------------------
+
+    /**
+     * Specifies the GPIO pin that will serve as input for the
+     * {@link com.egd.userinterface.controllers.SpeechToTextController}.
+     */
+    public static final String SPEECH_TO_TEXT_INPUT = GPIOPortsRaspberryPi.GPIO_PIN33;
 
     /**
      * Specifies the timeout for the speech recognition. After the specified time,
@@ -98,6 +104,6 @@ public class Constants {
     public static final int SPEECH_TO_TEXT_TIMEOUT = 10_000;
 
     // --------------------------------------------------------------
-    // End of SPEECH TO TEXT CONTROLLER region
+    // End of SPEECH TO TEXT region
     // --------------------------------------------------------------
 }
