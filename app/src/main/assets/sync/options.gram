@@ -1,0 +1,13 @@
+#JSGF V1.0;
+
+grammar menu;
+
+public <item> =
+find elevator |
+find traffic light |
+find bus number |
+navigate to berliner tor seven |
+navigate to forty fix harley street |
+navigate to ten downing street |
+menu options |
+test language model;

@@ -1,6 +1,7 @@
 package com.egd.userinterface.controllers;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
@@ -28,14 +29,22 @@ public class SpeechToTextController {
      */
     private static final String TAG = SpeechToTextController.class.getSimpleName();
 
-    private static SpeechToTextController sInstance;
-    private SpeechRecognizer mSpeechRecognizer;
+    /**
+     * Makes a connection between this string definition and a language
+     * model search options in en-us.lm.bin. This constant is used mainly
+     * to tell the recognizer for what should he search.
+     */
+    private static final String LANGUAGE_MODEL_EN = "LANGUAGE_MODEL_EN";
 
     /**
-     * Specifies that the language model for the given search should be
-     * every word from the dictionary.
+     * Makes a connection between this string definition and grammar search
+     * options in options.gram. This constant is used mainly to tell the
+     * recognizer for what should he search.
      */
-    private static final String FULL_DICTIONARY = "FULL_DICTIONARY";
+    private static final String GRAMMAR_OPTIONS = "GRAMMAR_OPTIONS";
+    private static SpeechToTextController sInstance;
+
+    private SpeechRecognizer mSpeechRecognizer;
 
     /**
      * Initializes the {@link SpeechRecognizer} by settings the acoustic model,
@@ -60,8 +69,13 @@ public class SpeechToTextController {
                         )
                         .getRecognizer();
 
+                speechRecognizer.addGrammarSearch(
+                        GRAMMAR_OPTIONS,
+                        new File(assetDir, "options.gram")
+                );
+
                 speechRecognizer.addNgramSearch(
-                        FULL_DICTIONARY,
+                        LANGUAGE_MODEL_EN,
                         new File(assetDir, "en-us.lm.bin")
                 );
 
@@ -74,7 +88,6 @@ public class SpeechToTextController {
                     // TODO: Give some feedback to the user that he can speak now
                     mSpeechRecognizer = speechRecognizer;
                     mSpeechRecognizer.addListener(new RecognitionListenerImplementation());
-                    mSpeechRecognizer.startListening(FULL_DICTIONARY, Constants.SPEECH_TO_TEXT_TIMEOUT);
                 } else {
                     // TODO: Implement some fallback
                 }
@@ -114,6 +127,14 @@ public class SpeechToTextController {
     }
 
     /**
+     * Attempts to convert the speech input by the user into an equivalent
+     * text format.
+     */
+    public void recognizeSpeech() {
+        mSpeechRecognizer.startListening(GRAMMAR_OPTIONS, Constants.SPEECH_TO_TEXT_TIMEOUT);
+    }
+
+    /**
      * Releases all resources held by the {@link SpeechToTextController}
      * class.
      */
@@ -143,30 +164,43 @@ public class SpeechToTextController {
         public void onEndOfSpeech() {
             // TODO
             Log.i(TAG, "SpeechToTextController.onEndOfSpeech()");
+            mSpeechRecognizer.stop();
         }
 
         @Override
         public void onPartialResult(Hypothesis hypothesis) {
-            // TODO
-            Log.i(TAG, "SpeechToTextController.onPartialResult()");
+            String partialResult = (hypothesis != null && !TextUtils.isEmpty(hypothesis.getHypstr()))
+                    ? hypothesis.getHypstr()
+                    : "";
+
+            // TODO: This is used only for testing the natural language recognition, remove in a future version
+            if ("test language model".equals(partialResult)) {
+                mSpeechRecognizer.startListening(LANGUAGE_MODEL_EN, Constants.SPEECH_TO_TEXT_TIMEOUT);
+            }
         }
 
         @Override
         public void onResult(Hypothesis hypothesis) {
-            // TODO
             Log.i(TAG, "SpeechToTextController.onResult()");
+
+            if (hypothesis != null && !TextUtils.isEmpty(hypothesis.getHypstr())) {
+                Log.e(TAG, hypothesis.getHypstr());
+                TextToSpeechController.getInstance().speak(hypothesis.getHypstr());
+            } else {
+                TextToSpeechController.getInstance().speak("I understood nothing!");
+            }
         }
 
         @Override
         public void onError(Exception e) {
             // TODO
-            Log.i(TAG, "SpeechToTextController.onError()", e);
+            Log.e(TAG, "SpeechToTextController.onError()", e);
         }
 
         @Override
         public void onTimeout() {
-            // TODO
             Log.i(TAG, "SpeechToTextController.onTimeout()");
+            mSpeechRecognizer.stop();
         }
     }
 }
