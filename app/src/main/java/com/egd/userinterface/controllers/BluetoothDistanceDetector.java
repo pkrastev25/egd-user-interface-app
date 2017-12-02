@@ -10,18 +10,21 @@ package com.egd.userinterface.controllers;
         import android.content.BroadcastReceiver;
         import android.content.Context;
         import android.content.Intent;
+        import android.content.IntentFilter;
         import android.util.Log;
 
+        import java.util.Set;
         import java.util.Timer;
         import java.util.TimerTask;
 
 
 public class BluetoothDistanceDetector
 {
-    private static final String ADAPTER_FRIENDLY_NAME = "My bluetooth device";
+    private static final String ADAPTER_FRIENDLY_NAME = "My Raspberry EGD Device";
     private static final String TAG = "BlutoothDistanceDetector";
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothProfile mA2DPSinkProxy;
+    private Context localContext;
 
     //during connection estblishing
     private long bluetoothDiscoveryDelay = 4000; //ms
@@ -32,8 +35,14 @@ public class BluetoothDistanceDetector
 
     private Timer bluetoothTimer = new Timer();
 
+    //searching and pairing devices
+    private Set<BluetoothDevice> pairedDevices;
     private TimerTask bluetoothSearch = new TimerTask() {
     synchronized public void run() {
+        pairedDevices= mBluetoothAdapter.getBondedDevices();
+        if (mBluetoothAdapter.isDiscovering()) {
+            mBluetoothAdapter.cancelDiscovery();
+        }
         mBluetoothAdapter.startDiscovery();
     }
 
@@ -49,10 +58,30 @@ public class BluetoothDistanceDetector
         }
         Log.d(TAG, "Set up Bluetooth Adapter name and profile");
         mBluetoothAdapter.setName(ADAPTER_FRIENDLY_NAME);
+        mBluetoothAdapter.getProfileProxy(localContext, new BluetoothProfile.ServiceListener() {
+            @Override
+            public void onServiceConnected(int profile, BluetoothProfile proxy) {
+                mA2DPSinkProxy = proxy;
+                enableDiscoverable(localContext);
+            }
+            @Override
+            public void onServiceDisconnected(int profile) {
+            }
+        }, 11);
     }
 
-    public void init() {
+    //discovering devices with bluetooth
+    private void enableDiscoverable(Context localContext) {
+        Log.d(TAG, "Registering for discovery.");
+        Intent discoverableIntent =
+                new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,
+                300);
+        localContext.startActivity(discoverableIntent);
+    }
 
+    public void init(Context newContext) {
+        this.localContext = newContext;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "No default Bluetooth adapter. Device likely does not support bluetooth.");
@@ -67,27 +96,27 @@ public class BluetoothDistanceDetector
             mBluetoothAdapter.enable();
         }
 
+        BluetoothReceiver blReceiver = new BluetoothReceiver();
+        localContext.registerReceiver(blReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+
+
         bluetoothTimer.scheduleAtFixedRate(bluetoothSearch, bluetoothDiscoveryDelay, bluetoothDiscoveryPeriod);
     }
 
     // launch discovery every 10 seconds or so
-
-
-
-    private final BroadcastReceiver receiver = new BroadcastReceiver(){
+    class BluetoothReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-
             String action = intent.getAction();
-            if(BluetoothDevice.ACTION_FOUND.equals(action)) {
+            if(BluetoothDevice.ACTION_FOUND.equals(action)){
                 int  rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
                 //should check name here
                 Log.i(TAG, "Signal strength:" + rssi);
-                if (rssi<SIGNAL_STRENGTH_THRESHOLD){
-                    // here we should notify user
-                }
+
             }
         }
     };
+
+
 }
 
