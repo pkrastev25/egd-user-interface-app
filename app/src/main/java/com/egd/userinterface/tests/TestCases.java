@@ -3,6 +3,7 @@ package com.egd.userinterface.tests;
 import android.os.Handler;
 import android.util.Log;
 
+import com.egd.userinterface.constants.enums.SpeechRecognitionTypes;
 import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MotorController;
 import com.egd.userinterface.controllers.SpeechToTextController;
@@ -71,6 +72,6 @@ public class TestCases {
      */
     public static void SpeechToTextControllerTest() {
         Log.i(TAG, "TestCases.SpeechToTextControllerTest() call");
-        SpeechToTextController.getInstance().recognizeSpeech();
+        SpeechToTextController.getInstance().recognizeSpeech(SpeechRecognitionTypes.ALL_KEYWORDS);
     }
 }

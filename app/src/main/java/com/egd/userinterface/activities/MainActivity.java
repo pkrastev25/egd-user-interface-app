@@ -4,8 +4,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.egd.userinterface.R;
+import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.controllers.LEDController;
+import com.egd.userinterface.controllers.MenuController;
 import com.egd.userinterface.controllers.MotorController;
+import com.egd.userinterface.controllers.PowerSupplyController;
 import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
 import com.egd.userinterface.tests.TestCases;
@@ -15,20 +18,35 @@ import com.egd.userinterface.tests.TestCases;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private PowerSupplyController mPowerSupplyController;
+    private MenuController mMenuController;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mPowerSupplyController = new PowerSupplyController(
+                Constants.POWER_SUPPLY_BUTTONS
+        );
+
+        mMenuController = new MenuController(
+                Constants.MENU_INPUT_BUTTON_5,
+                Constants.MENU_INPUT_BUTTON_8
+        );
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        TestCases.LEDControllerTest();
-        TestCases.MotorControllerTest();
-        TestCases.TextToSpeechControllerTest();
-        TestCases.SpeechToTextControllerTest();
+        /*
+         * Test cases below. Uncomment if a certain module must be tested!
+         */
+        //TestCases.LEDControllerTest();
+        //TestCases.MotorControllerTest();
+        //TestCases.TextToSpeechControllerTest();
+        //TestCases.SpeechToTextControllerTest();
     }
 
     @Override
@@ -39,5 +57,7 @@ public class MainActivity extends AppCompatActivity {
         MotorController.getInstance().clean();
         TextToSpeechController.getInstance().clean();
         SpeechToTextController.getInstance().clean();
+        mPowerSupplyController.clean();
+        mMenuController.clean();
     }
 }

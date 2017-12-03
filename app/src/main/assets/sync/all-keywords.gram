@@ -1,0 +1,5 @@
+#JSGF V1.0;
+
+grammar keywords;
+
+public <item> = find | navigate | test;

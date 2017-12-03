@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">UserInterface</string>
+
+    <!-- SPEECH RECOGNITION region -->
+
+    <!-- Represents the words stored inside all-keywords.gram inside the assets folder -->
+    <string name="speech_recognition_keyword_find">find</string>
+    <string name="speech_recognition_keyword_navigate">navigate</string>
+    <string name="speech_recognition_keyword_test">test</string>
+
+    <!-- Generic feedback from the speech recognition -->
+    <string name="speech_recognition_feedback_no_result">I understood nothing. Try again!</string>
+
+    <!-- End of SPEECH RECOGNITION region -->
 </resources>

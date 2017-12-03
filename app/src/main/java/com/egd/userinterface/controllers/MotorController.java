@@ -8,6 +8,7 @@ import com.egd.userinterface.controllers.models.IMotorController;
 import com.egd.userinterface.utils.GPIOUtil;
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
+import com.google.android.things.pio.Pwm;
 
 import java.io.IOException;
 
@@ -26,9 +27,12 @@ public class MotorController implements IMotorController {
     private static final String TAG = MotorController.class.getSimpleName();
     private static IMotorController sInstance;
 
+    // INPUT/OUTPUT helpers
     private Gpio mInput;
-    private Gpio mOutput;
+    private Pwm mPWMOutput;
     private GpioCallback mInputCallback;
+
+    // STATE helpers
     private boolean mIsActive;
 
     /**
@@ -56,18 +60,26 @@ public class MotorController implements IMotorController {
             }
         };
 
-        mInput = GPIOUtil.configureInputGPIO(
-                Constants.MOTOR_GPIO_INPUT,
-                true,
-                GPIOEdgeTriggerType.EDGE_RISING,
-                mInputCallback
-        );
+        try {
+            mInput = GPIOUtil.configureInputGPIO(
+                    Constants.MOTOR_GPIO_INPUT,
+                    true,
+                    GPIOEdgeTriggerType.EDGE_RISING,
+                    mInputCallback
+            );
+        } catch (IOException e) {
+            Log.e(TAG, "GPIOUtil.configureInputGPIO() failed!", e);
+        }
 
-        mOutput = GPIOUtil.configureOutputGPIO(
-                Constants.MOTOR_GPIO_OUTPUT,
-                false,
-                true
-        );
+        try {
+            mPWMOutput = GPIOUtil.configurePWM(
+                    Constants.MOTOR_GPIO_OUTPUT,
+                    Constants.MOTOR_PWM_DUTY_CYCLE,
+                    Constants.MOTOR_PWM_FREQUENCY
+            );
+        } catch (IOException e) {
+            Log.e(TAG, "GPIOUtil.configurePWM()", e);
+        }
     }
 
     /**
@@ -94,24 +106,31 @@ public class MotorController implements IMotorController {
     }
 
     /**
-     * Start the motor by giving the required voltage level to the
-     * motor output pin.
+     * Starts the motor by enabling the PWM ouput.
      */
     @Override
     public void start() {
-        if (!mIsActive) {
-            mIsActive = true;
-            runMotor();
+        mIsActive = true;
+
+        try {
+            mPWMOutput.setEnabled(true);
+        } catch (IOException e) {
+            Log.e(TAG, "MotorController.start() failed!", e);
         }
     }
 
     /**
-     * Stop the motor by giving the required voltage level to the
-     * motor output pin.
+     * Stops the motor by disabling the PWM output.
      */
     @Override
     public void stop() {
         mIsActive = false;
+
+        try {
+            mPWMOutput.setEnabled(false);
+        } catch (IOException e) {
+            Log.e(TAG, "MotorController.stop() failed!", e);
+        }
     }
 
     /**
@@ -127,37 +146,19 @@ public class MotorController implements IMotorController {
         try {
             mInput.unregisterGpioCallback(mInputCallback);
             mInput.close();
-            mOutput.close();
+        } catch (IOException e) {
+            Log.e(TAG, "MotorController.clean() failed!", e);
+        }
+
+        try {
+            mPWMOutput.close();
         } catch (IOException e) {
             Log.e(TAG, "MotorController.clean() failed!", e);
         }
 
         mInputCallback = null;
         mInput = null;
-        mOutput = null;
+        mPWMOutput = null;
         sInstance = null;
-    }
-
-    /**
-     * Toggles the ON and OFF state of the motor every
-     * {@link Constants#MOTOR_ON_OFF_SWITCH_TIME}.
-     */
-    private void runMotor() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean highVoltage = true;
-
-                while (mIsActive) {
-                    try {
-                        mOutput.setValue(highVoltage);
-                        highVoltage = !highVoltage;
-                        Thread.sleep(Constants.MOTOR_ON_OFF_SWITCH_TIME);
-                    } catch (Exception e) {
-                        Log.e(TAG, "MotorController.runMotor() failed!", e);
-                    }
-                }
-            }
-        }).start();
     }
 }

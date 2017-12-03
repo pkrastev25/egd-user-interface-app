@@ -1,5 +1,6 @@
 package com.egd.userinterface.controllers;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
@@ -10,8 +11,6 @@ import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Singleton, used to manage the state of the external LEDs. Internally
@@ -28,10 +27,14 @@ public class LEDController implements ILEDController {
     private static final String TAG = LEDController.class.getSimpleName();
     private static ILEDController sInstance;
 
+    // INPUT/OUTPUT helpers
     private Gpio mInput;
-    private List<Gpio> mOutputs;
+    private Gpio mOutput;
     private GpioCallback mInputCallback;
+
+    // STATE helpers
     private boolean mIsActive;
+    private boolean mShouldDetectEdge;
 
     /**
      * Initializes the {@link LEDController}. Configures a pin as input
@@ -39,16 +42,28 @@ public class LEDController implements ILEDController {
      * according to {@link Constants#LED_GPIO_OUTPUT}.
      */
     private LEDController() {
+        mShouldDetectEdge = true;
         mInputCallback = new GpioCallback() {
             @Override
             public boolean onGpioEdge(Gpio gpio) {
-                if (mIsActive) {
-                    LEDsOFF();
-                } else {
-                    LEDsON();
+                // TODO: Verify if this is really needed
+                if (mShouldDetectEdge) {
+                    mShouldDetectEdge = false;
+
+                    if (mIsActive) {
+                        LEDsOFF();
+                    } else {
+                        LEDsON();
+                    }
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mShouldDetectEdge = true;
+                        }
+                    }, Constants.GPIO_CALLBACK_SAMPLE_TIME_MS);
                 }
 
-                // Continue listening for more interrupts
                 return true;
             }
 
@@ -59,22 +74,25 @@ public class LEDController implements ILEDController {
             }
         };
 
-        mInput = GPIOUtil.configureInputGPIO(
-                Constants.LED_GPIO_INPUT,
-                true,
-                GPIOEdgeTriggerType.EDGE_RISING,
-                mInputCallback
-        );
-        mOutputs = new ArrayList<>(Constants.LED_GPIO_OUTPUT.length);
-
-        for (String pinName : Constants.LED_GPIO_OUTPUT) {
-            mOutputs.add(
-                    GPIOUtil.configureOutputGPIO(
-                            pinName,
-                            false,
-                            true
-                    )
+        try {
+            mInput = GPIOUtil.configureInputGPIO(
+                    Constants.LED_GPIO_INPUT,
+                    true,
+                    GPIOEdgeTriggerType.EDGE_RISING,
+                    mInputCallback
             );
+        } catch (IOException e) {
+            Log.e(TAG, "GPIOUtil.configureInputGPIO() failed!", e);
+        }
+
+        try {
+            mOutput = GPIOUtil.configureOutputGPIO(
+                    Constants.LED_GPIO_OUTPUT,
+                    false,
+                    true
+            );
+        } catch (IOException e) {
+            Log.e(TAG, "GPIOUtil.configureInputGPIO() failed!", e);
         }
     }
 
@@ -109,12 +127,10 @@ public class LEDController implements ILEDController {
     public void LEDsON() {
         mIsActive = true;
 
-        for (Gpio gpio : mOutputs) {
-            try {
-                gpio.setValue(true);
-            } catch (IOException e) {
-                Log.e(TAG, "LEDController.LEDsOn() failed!", e);
-            }
+        try {
+            mOutput.setValue(true);
+        } catch (IOException e) {
+            Log.e(TAG, "LEDController.LEDsOn() failed!", e);
         }
     }
 
@@ -126,12 +142,10 @@ public class LEDController implements ILEDController {
     public void LEDsOFF() {
         mIsActive = false;
 
-        for (Gpio gpio : mOutputs) {
-            try {
-                gpio.setValue(false);
-            } catch (IOException e) {
-                Log.e(TAG, "LEDController.LEDsOff() failed!", e);
-            }
+        try {
+            mOutput.setValue(false);
+        } catch (IOException e) {
+            Log.e(TAG, "LEDController.LEDsOff() failed!", e);
         }
     }
 
@@ -148,20 +162,15 @@ public class LEDController implements ILEDController {
             Log.e(TAG, "LEDController.clean() failed!", e);
         }
 
-        if (mOutputs != null) {
-            for (Gpio gpio : mOutputs) {
-                try {
-                    gpio.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "LEDController.clean() failed!", e);
-                }
-            }
-
-            mInput = null;
-            mInputCallback = null;
-            mOutputs.clear();
-            mOutputs = null;
-            sInstance = null;
+        try {
+            mOutput.close();
+        } catch (IOException e) {
+            Log.e(TAG, "LEDController.clean() failed!", e);
         }
+
+        mInput = null;
+        mInputCallback = null;
+        mOutput = null;
+        sInstance = null;
     }
 }

@@ -1,3 +1,4 @@
+all-keywords.gram
 cmudict-en-us.dict
 en-us-ptm/README
 en-us-ptm/feat.params
@@ -8,4 +9,6 @@ en-us-ptm/sendump
 en-us-ptm/transition_matrices
 en-us-ptm/variances
 en-us.lm.bin
+find-keyword.gram
+navigate-keyword.gram
 options.gram

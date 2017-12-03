@@ -1,13 +1,14 @@
 package com.egd.userinterface.utils;
 
-import android.support.annotation.Nullable;
-import android.util.Log;
-
 import com.egd.userinterface.constants.enums.GPIOEdgeTriggerType;
+import com.egd.userinterface.constants.enums.GPIOPWMRaspberryPi;
 import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPi;
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
 import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.Pwm;
+
+import java.io.IOException;
 
 /**
  * Helper class used to initialize GPIOs, contains annotation types used
@@ -19,31 +20,20 @@ import com.google.android.things.pio.PeripheralManagerService;
 public class GPIOUtil {
 
     /**
-     * Represents the class name, used only for debugging.
-     */
-    private static final String TAG = GPIOUtil.class.getSimpleName();
-
-    /**
      * Configures a GPIO as an input according to the specifications.
      *
      * @param pinName          Name of the GPIO port, must be one of type {@link GPIOPortsRaspberryPi}
      * @param isHighActiveType If true, the active type of the GPIO will be set to {@link Gpio#ACTIVE_HIGH}, false otherwise, {@link Gpio#ACTIVE_LOW}
-     * @return Configured {@link Gpio}, null if the configuration failed
+     * @return Configured {@link Gpio}
+     * @throws IOException If the configuration of the {@link Gpio} fails
      */
-    @Nullable
-    public static Gpio configureInputGPIO(@GPIOPortsRaspberryPi String pinName, boolean isHighActiveType, @GPIOEdgeTriggerType int triggerType, GpioCallback callback) {
-        Gpio gpio = null;
-
-        try {
-            PeripheralManagerService service = new PeripheralManagerService();
-            gpio = service.openGpio(pinName);
-            gpio.setDirection(Gpio.DIRECTION_IN);
-            gpio.setActiveType(isHighActiveType ? Gpio.ACTIVE_HIGH : Gpio.ACTIVE_LOW);
-            gpio.setEdgeTriggerType(triggerType);
-            gpio.registerGpioCallback(callback);
-        } catch (Exception e) {
-            Log.e(TAG, "GPIOUtil.configureInputGPIO() failed!", e);
-        }
+    public static Gpio configureInputGPIO(@GPIOPortsRaspberryPi String pinName, boolean isHighActiveType, @GPIOEdgeTriggerType int triggerType, GpioCallback callback) throws IOException {
+        PeripheralManagerService service = new PeripheralManagerService();
+        Gpio gpio = service.openGpio(pinName);
+        gpio.setDirection(Gpio.DIRECTION_IN);
+        gpio.setActiveType(isHighActiveType ? Gpio.ACTIVE_HIGH : Gpio.ACTIVE_LOW);
+        gpio.setEdgeTriggerType(triggerType);
+        gpio.registerGpioCallback(callback);
 
         return gpio;
     }
@@ -54,21 +44,33 @@ public class GPIOUtil {
      * @param pinName          Name of the GPIO port, must be one of type {@link GPIOPortsRaspberryPi}
      * @param isInitiallyHigh  If true, the GPIO will have an initial value of high, {@link Gpio#DIRECTION_OUT_INITIALLY_HIGH}, false otherwise, {@link Gpio#DIRECTION_OUT_INITIALLY_LOW}
      * @param isHighActiveType If true, the active type of the GPIO will be set to {@link Gpio#ACTIVE_HIGH}, false otherwise, {@link Gpio#ACTIVE_LOW}
-     * @return Configured {@link Gpio}, null if the configuration failed
+     * @return Configured {@link Gpio}
+     * @throws IOException If the configuration of the {@link Gpio} fails
      */
-    @Nullable
-    public static Gpio configureOutputGPIO(@GPIOPortsRaspberryPi String pinName, boolean isInitiallyHigh, boolean isHighActiveType) {
-        Gpio gpio = null;
-
-        try {
-            PeripheralManagerService service = new PeripheralManagerService();
-            gpio = service.openGpio(pinName);
-            gpio.setDirection(isInitiallyHigh ? Gpio.DIRECTION_OUT_INITIALLY_HIGH : Gpio.DIRECTION_OUT_INITIALLY_LOW);
-            gpio.setActiveType(isHighActiveType ? Gpio.ACTIVE_HIGH : Gpio.ACTIVE_LOW);
-        } catch (Exception e) {
-            Log.e(TAG, "GPIOUtil.configureOutputGPIO() failed!", e);
-        }
+    public static Gpio configureOutputGPIO(@GPIOPortsRaspberryPi String pinName, boolean isInitiallyHigh, boolean isHighActiveType) throws IOException {
+        PeripheralManagerService service = new PeripheralManagerService();
+        Gpio gpio = service.openGpio(pinName);
+        gpio.setDirection(isInitiallyHigh ? Gpio.DIRECTION_OUT_INITIALLY_HIGH : Gpio.DIRECTION_OUT_INITIALLY_LOW);
+        gpio.setActiveType(isHighActiveType ? Gpio.ACTIVE_HIGH : Gpio.ACTIVE_LOW);
 
         return gpio;
+    }
+
+    /**
+     * Configures a GPIO as a PWM output signal according to the specifications.
+     *
+     * @param pinName Name of the GPIO port, must be one of type {@link GPIOPortsRaspberryPi}
+     * @param dutyCycle Specifies the transition from high to low voltage, or vice versa, as a percentage for the PWM signal
+     * @param frequency Specifies the frequency of the PWM signal
+     * @return Configured {@link Gpio}
+     * @throws IOException If the configuration of the {@link Gpio} fails
+     */
+    public static Pwm configurePWM(@GPIOPWMRaspberryPi String pinName, double dutyCycle, double frequency) throws IOException {
+        PeripheralManagerService service = new PeripheralManagerService();
+        Pwm pwm = service.openPwm(pinName);
+        pwm.setPwmFrequencyHz(frequency);
+        pwm.setPwmDutyCycle(dutyCycle);
+
+        return pwm;
     }
 }
