@@ -3,6 +3,7 @@ package com.egd.userinterface.tests;
 import android.os.Handler;
 import android.util.Log;
 
+import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.constants.enums.SpeechRecognitionTypes;
 import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MotorController;
@@ -40,11 +41,18 @@ public class TestCases {
      */
     public static void LEDControllerTest() {
         Log.i(TAG, "TestCases.LEDControllerTest() call");
-        LEDController.getInstance().LEDsON();
+
+        final LEDController controller = new LEDController(
+                Constants.LED_GPIO_INPUT,
+                Constants.LED_GPIO_OUTPUT
+        );
+
+        controller.LEDsON();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                LEDController.getInstance().LEDsOFF();
+                controller.LEDsOFF();
+                controller.clean();
                 Log.i(TAG, "TestCases.LEDControllerTest() last call");
             }
         }, TimeUnit.SECONDS.toMillis(30));

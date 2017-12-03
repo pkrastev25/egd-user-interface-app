@@ -48,6 +48,7 @@ public class SpeechToTextController implements ISpeechToTextController {
     private GpioCallback mInputCallback;
 
     // STATE helpers
+    private boolean mIsInitialized;
     private boolean mIsActive;
 
     /**
@@ -148,7 +149,7 @@ public class SpeechToTextController implements ISpeechToTextController {
                     // TODO: Give some feedback to the user that he can speak now
                     mSpeechRecognizer = speechRecognizer;
                     mSpeechRecognizer.addListener(new RecognitionListenerImplementation());
-                    mIsActive = true;
+                    mIsInitialized = true;
                 } else {
                     // TODO: Implement some fallback
                 }
@@ -170,7 +171,13 @@ public class SpeechToTextController implements ISpeechToTextController {
      * @param context {@link Context} reference
      */
     public static void initialize(Context context) {
-        sInstance = new SpeechToTextController(context);
+        if (sInstance == null) {
+            synchronized (SpeechToTextController.class) {
+                if (sInstance == null) {
+                    sInstance = new SpeechToTextController(context);
+                }
+            }
+        }
     }
 
     /**
@@ -195,8 +202,11 @@ public class SpeechToTextController implements ISpeechToTextController {
      */
     @Override
     public void recognizeSpeech(@SpeechRecognitionTypes String type) {
-        if (mIsActive) {
-            mSpeechRecognizer.startListening(type, Constants.SPEECH_TO_TEXT_TIMEOUT);
+        synchronized (SpeechToTextController.class) {
+            if (mIsInitialized && !mIsActive) {
+                mSpeechRecognizer.startListening(type, Constants.SPEECH_TO_TEXT_TIMEOUT);
+                mIsActive = true;
+            }
         }
     }
 
@@ -215,12 +225,13 @@ public class SpeechToTextController implements ISpeechToTextController {
         try {
             mInput.unregisterGpioCallback(mInputCallback);
             mInput.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "SpeechToTextController.clean() failed!", e);
         }
 
         mInputCallback = null;
         mInput = null;
+        mIsInitialized = false;
         mIsActive = false;
         sInstance = null;
     }
@@ -282,6 +293,7 @@ public class SpeechToTextController implements ISpeechToTextController {
         @Override
         public void onResult(Hypothesis hypothesis) {
             Log.i(TAG, "SpeechToTextController.onResult()");
+            mIsActive = false;
 
             if (hypothesis == null) {
                 TextToSpeechController.getInstance().speak(mNoResultFeedback);
@@ -291,6 +303,7 @@ public class SpeechToTextController implements ISpeechToTextController {
             if (SpeechRecognitionTypes.ALL_KEYWORDS.equals(mSpeechRecognizer.getSearchName())) {
                 if (mKeywordContainer.get(hypothesis.getHypstr()) != null) {
                     mSpeechRecognizer.startListening(mKeywordContainer.get(hypothesis.getHypstr()), Constants.SPEECH_TO_TEXT_TIMEOUT);
+                    mIsActive = true;
                 } else {
                     TextToSpeechController.getInstance().speak(mNoResultFeedback);
                 }

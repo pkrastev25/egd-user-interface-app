@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.constants.enums.GPIOEdgeTriggerType;
+import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPi;
 import com.egd.userinterface.controllers.models.ILEDController;
 import com.egd.userinterface.utils.GPIOUtil;
 import com.google.android.things.pio.Gpio;
@@ -13,7 +14,7 @@ import com.google.android.things.pio.GpioCallback;
 import java.io.IOException;
 
 /**
- * Singleton, used to manage the state of the external LEDs. Internally
+ * Helper class used to manage the state of the external LEDs. Internally
  * used {@link Gpio} to realize the functionality.
  *
  * @author Petar Krastev
@@ -25,7 +26,6 @@ public class LEDController implements ILEDController {
      * Represents the class name, used only for debugging.
      */
     private static final String TAG = LEDController.class.getSimpleName();
-    private static ILEDController sInstance;
 
     // INPUT/OUTPUT helpers
     private Gpio mInput;
@@ -37,11 +37,12 @@ public class LEDController implements ILEDController {
     private boolean mShouldDetectEdge;
 
     /**
-     * Initializes the {@link LEDController}. Configures a pin as input
-     * according to {@link Constants#LED_GPIO_INPUT} and a pin as output
-     * according to {@link Constants#LED_GPIO_OUTPUT}.
+     * Initializes the {@link LEDController}.
+     *
+     * @param input The {@link Gpio} that will be configured as input
+     * @param output The {@link Gpio} that will be configured as output
      */
-    private LEDController() {
+    public LEDController(@GPIOPortsRaspberryPi String input, @GPIOPortsRaspberryPi String output) {
         mShouldDetectEdge = true;
         mInputCallback = new GpioCallback() {
             @Override
@@ -76,7 +77,7 @@ public class LEDController implements ILEDController {
 
         try {
             mInput = GPIOUtil.configureInputGPIO(
-                    Constants.LED_GPIO_INPUT,
+                    input,
                     true,
                     GPIOEdgeTriggerType.EDGE_RISING,
                     mInputCallback
@@ -87,36 +88,13 @@ public class LEDController implements ILEDController {
 
         try {
             mOutput = GPIOUtil.configureOutputGPIO(
-                    Constants.LED_GPIO_OUTPUT,
+                    output,
                     false,
                     true
             );
         } catch (IOException e) {
             Log.e(TAG, "GPIOUtil.configureInputGPIO() failed!", e);
         }
-    }
-
-    /**
-     * Initializes the {@link LEDController} instance.
-     */
-    public static void initialize() {
-        if (sInstance == null) {
-            sInstance = new LEDController();
-        }
-    }
-
-    /**
-     * Expose the only instance of {@link LEDController}.
-     *
-     * @return The {@link LEDController} instance
-     * @throws RuntimeException If {@link LEDController#initialize()} is not called before this method
-     */
-    public static ILEDController getInstance() {
-        if (sInstance == null) {
-            throw new RuntimeException("You must call LEDController.initialize() first!");
-        }
-
-        return sInstance;
     }
 
     /**
@@ -158,19 +136,18 @@ public class LEDController implements ILEDController {
         try {
             mInput.unregisterGpioCallback(mInputCallback);
             mInput.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "LEDController.clean() failed!", e);
         }
 
         try {
             mOutput.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "LEDController.clean() failed!", e);
         }
 
         mInput = null;
         mInputCallback = null;
         mOutput = null;
-        sInstance = null;
     }
 }

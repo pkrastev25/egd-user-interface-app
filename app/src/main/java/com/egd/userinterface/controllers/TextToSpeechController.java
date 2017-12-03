@@ -83,12 +83,16 @@ public class TextToSpeechController implements ITextToSpeechController {
      */
     public static void initialize(Context context) {
         if (sInstance == null) {
-            sInstance = new TextToSpeechController(
-                    context,
-                    Constants.TEXT_TO_SPEECH_DEFAULT_LANGUAGE,
-                    Constants.TEXT_TO_SPEECH_DEFAULT_PITCH,
-                    Constants.TEXT_TO_SPEECH_DEFAULT_SPEECH_RATE
-            );
+            synchronized (TextToSpeechController.class) {
+                if (sInstance == null) {
+                    sInstance = new TextToSpeechController(
+                            context,
+                            Constants.TEXT_TO_SPEECH_DEFAULT_LANGUAGE,
+                            Constants.TEXT_TO_SPEECH_DEFAULT_PITCH,
+                            Constants.TEXT_TO_SPEECH_DEFAULT_SPEECH_RATE
+                    );
+                }
+            }
         }
     }
 
@@ -117,15 +121,17 @@ public class TextToSpeechController implements ITextToSpeechController {
      */
     @Override
     public void speak(String output) {
-        if (mIsInitialized) {
-            int result = mTextToSpeech.speak(output, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID);
+        synchronized (TextToSpeechController.class) {
+            if (mIsInitialized) {
+                int result = mTextToSpeech.speak(output, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID);
 
-            if (result == TextToSpeech.ERROR) {
-                Log.e(TAG, "TextToSpeech.speak() failed!");
-                // TODO: Implement some fallback
+                if (result == TextToSpeech.ERROR) {
+                    Log.e(TAG, "TextToSpeech.speak() failed!");
+                    // TODO: Implement some fallback
+                }
+            } else {
+                mPendingOperations.add(output);
             }
-        } else {
-            mPendingOperations.add(output);
         }
     }
 

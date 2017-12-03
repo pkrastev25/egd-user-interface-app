@@ -72,13 +72,13 @@ public class MenuController implements IController {
     public void clean() {
         try {
             mButton5.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "MenuController.clean() failed!", e);
         }
 
         try {
             mButton8.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "MenuController.clean() failed!", e);
         }
 

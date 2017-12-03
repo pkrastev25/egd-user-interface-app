@@ -18,6 +18,7 @@ import com.egd.userinterface.tests.TestCases;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private LEDController mLEDController;
     private PowerSupplyController mPowerSupplyController;
     private MenuController mMenuController;
 
@@ -25,6 +26,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mLEDController = new LEDController(
+                Constants.LED_GPIO_INPUT,
+                Constants.LED_GPIO_OUTPUT
+        );
 
         mPowerSupplyController = new PowerSupplyController(
                 Constants.POWER_SUPPLY_BUTTONS
@@ -53,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        LEDController.getInstance().clean();
         MotorController.getInstance().clean();
         TextToSpeechController.getInstance().clean();
         SpeechToTextController.getInstance().clean();
+        mLEDController.clean();
         mPowerSupplyController.clean();
         mMenuController.clean();
     }

@@ -52,7 +52,7 @@ public class PowerSupplyController implements IController {
     public void clean() {
         try {
             mPowerSupply.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "PowerSupplyController.clean() failed!", e);
         }
 

@@ -87,7 +87,11 @@ public class MotorController implements IMotorController {
      */
     public static void initialize() {
         if (sInstance == null) {
-            sInstance = new MotorController();
+            synchronized (MotorController.class) {
+                if (sInstance == null) {
+                    sInstance = new MotorController();
+                }
+            }
         }
     }
 
@@ -110,12 +114,14 @@ public class MotorController implements IMotorController {
      */
     @Override
     public void start() {
-        mIsActive = true;
+        synchronized (MotorController.class) {
+            mIsActive = true;
 
-        try {
-            mPWMOutput.setEnabled(true);
-        } catch (IOException e) {
-            Log.e(TAG, "MotorController.start() failed!", e);
+            try {
+                mPWMOutput.setEnabled(true);
+            } catch (IOException e) {
+                Log.e(TAG, "MotorController.start() failed!", e);
+            }
         }
     }
 
@@ -124,12 +130,14 @@ public class MotorController implements IMotorController {
      */
     @Override
     public void stop() {
-        mIsActive = false;
+        synchronized (MotorController.class) {
+            mIsActive = false;
 
-        try {
-            mPWMOutput.setEnabled(false);
-        } catch (IOException e) {
-            Log.e(TAG, "MotorController.stop() failed!", e);
+            try {
+                mPWMOutput.setEnabled(false);
+            } catch (IOException e) {
+                Log.e(TAG, "MotorController.stop() failed!", e);
+            }
         }
     }
 
@@ -139,20 +147,16 @@ public class MotorController implements IMotorController {
      */
     @Override
     public void clean() {
-        if (mIsActive) {
-            mIsActive = false;
-        }
-
         try {
             mInput.unregisterGpioCallback(mInputCallback);
             mInput.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "MotorController.clean() failed!", e);
         }
 
         try {
             mPWMOutput.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "MotorController.clean() failed!", e);
         }
 
@@ -160,5 +164,6 @@ public class MotorController implements IMotorController {
         mInput = null;
         mPWMOutput = null;
         sInstance = null;
+        mIsActive = false;
     }
 }
