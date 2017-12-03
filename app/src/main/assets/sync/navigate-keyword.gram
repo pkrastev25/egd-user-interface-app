@@ -2,4 +2,4 @@
 
 grammar navigate;
 
-public <item> = berliner tor seven | forty fix harley street | ten downing street;
+public <item> = berliner tor seven | forty six harley street | ten downing street;

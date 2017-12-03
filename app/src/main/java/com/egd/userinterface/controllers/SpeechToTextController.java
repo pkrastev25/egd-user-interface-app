@@ -116,25 +116,25 @@ public class SpeechToTextController implements ISpeechToTextController {
                         )
                         .getRecognizer();
 
-                // Include a search option
-                speechRecognizer.addGrammarSearch(
+                // Include a search option for the keywords
+                speechRecognizer.addKeywordSearch(
                         SpeechRecognitionTypes.ALL_KEYWORDS,
                         SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypes.ALL_KEYWORDS, locale)
                 );
 
-                // Include a search option
+                // Include a search option for the find keyword context
                 speechRecognizer.addGrammarSearch(
                         SpeechRecognitionTypes.FIND_KEYWORD,
                         SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypes.FIND_KEYWORD, locale)
                 );
 
-                // Include a search option
+                // Include a search option for the navigate keyword context
                 speechRecognizer.addGrammarSearch(
                         SpeechRecognitionTypes.NAVIGATE_KEYWORD,
                         SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypes.NAVIGATE_KEYWORD, locale)
                 );
 
-                // Include a search option
+                // Include a search option for the navigate keyword context
                 speechRecognizer.addNgramSearch(
                         SpeechRecognitionTypes.TEST_KEYWORD,
                         SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypes.TEST_KEYWORD, locale)

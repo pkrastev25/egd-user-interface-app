@@ -41,12 +41,12 @@ public class SpeechRecognitionUtil {
                 }
             case SpeechRecognitionTypes.TEST_KEYWORD:
                 if (Locale.US.equals(locale)) {
-                    return new File(assetsDir, "en-us.lm.bin");
+                    return new File(assetsDir, "test-keyword.bin");
                 }
             case SpeechRecognitionTypes.ALL_KEYWORDS:
             default:
                 if (Locale.US.equals(locale)) {
-                    return new File(assetsDir, "all-keywords.gram");
+                    return new File(assetsDir, "all-keywords.list");
                 } else {
                     throw new RuntimeException(String.format(
                             "SpeechRecognitionUtil.getAssetsForKeyword() failed! The selected locale:%s is not supported!",

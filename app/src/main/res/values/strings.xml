@@ -3,7 +3,7 @@
 
     <!-- SPEECH RECOGNITION region -->
 
-    <!-- Represents the words stored inside all-keywords.gram inside the assets folder -->
+    <!-- Represents the words stored inside all-keywords.list inside the assets folder -->
     <string name="speech_recognition_keyword_find">find</string>
     <string name="speech_recognition_keyword_navigate">navigate</string>
     <string name="speech_recognition_keyword_test">test</string>

@@ -23,7 +23,7 @@ public @interface SpeechRecognitionTypes {
 
     /**
      * Specifies that the {@link com.egd.userinterface.controllers.SpeechToTextController}
-     * should recognize keywords stored in all-keywords.gram.
+     * should recognize keywords stored in all-keywords.list.
      */
     String ALL_KEYWORDS = "ALL_KEYWORDS";
 
@@ -41,7 +41,7 @@ public @interface SpeechRecognitionTypes {
 
     /**
      * Specifies that the {@link com.egd.userinterface.controllers.SpeechToTextController}
-     * should recognize keywords stored in test-keyword.gram.
+     * should recognize natural language processing according to test-keyword.bin.
      */
     String TEST_KEYWORD = "TEST_KEYWORD";
 }
