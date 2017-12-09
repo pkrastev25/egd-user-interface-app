@@ -11,16 +11,17 @@ import com.egd.userinterface.controllers.MotorController;
 import com.egd.userinterface.controllers.PowerSupplyController;
 import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
-import com.egd.userinterface.tests.TestCases;
+import com.egd.userinterface.controllers.models.IController;
+import com.egd.userinterface.controllers.models.ILEDController;
 
 /**
  * Entry point for the application.
  */
 public class MainActivity extends AppCompatActivity {
 
-    private LEDController mLEDController;
-    private PowerSupplyController mPowerSupplyController;
-    private MenuController mMenuController;
+    private ILEDController mLEDController;
+    private IController mPowerSupplyController;
+    private IController mMenuController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,11 @@ public class MainActivity extends AppCompatActivity {
                 Constants.MENU_INPUT_BUTTON_5,
                 Constants.MENU_INPUT_BUTTON_8
         );
+
+        // Init just in case the activity got destroyed
+        MotorController.init();
+        TextToSpeechController.init(this);
+        SpeechToTextController.init(this);
     }
 
     @Override

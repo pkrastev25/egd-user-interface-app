@@ -4,6 +4,7 @@ import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import com.egd.userinterface.R;
 import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.controllers.models.ITextToSpeechController;
 
@@ -56,6 +57,10 @@ public class TextToSpeechController implements ITextToSpeechController {
      */
     private TextToSpeechController(Context context, final Locale language, final float pitch, final float speechRate) {
         mPendingOperations = new LinkedList<>();
+        mPendingOperations.add(
+                context.getString(R.string.text_to_speech_module_init_success)
+        );
+
         mTextToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -68,7 +73,7 @@ public class TextToSpeechController implements ITextToSpeechController {
                 } else {
                     Log.e(TAG, "TextToSpeech.OnInitListener() failed!");
                     mTextToSpeech = null;
-                    // TODO: Implement some fallback
+                    MotorController.getInstance().start();
                 }
             }
         });
@@ -81,7 +86,7 @@ public class TextToSpeechController implements ITextToSpeechController {
      *
      * @param context {@link Context} reference
      */
-    public static void initialize(Context context) {
+    public static void init(Context context) {
         if (sInstance == null) {
             synchronized (TextToSpeechController.class) {
                 if (sInstance == null) {
@@ -100,11 +105,11 @@ public class TextToSpeechController implements ITextToSpeechController {
      * Expose the only instance of {@link TextToSpeechController}.
      *
      * @return The {@link TextToSpeechController} instance
-     * @throws RuntimeException If {@link TextToSpeechController#initialize(Context)} is not called before this method
+     * @throws RuntimeException If {@link TextToSpeechController#init(Context)} is not called before this method
      */
     public static ITextToSpeechController getInstance() {
         if (sInstance == null) {
-            throw new RuntimeException("You must call TextToSpeechController.initialize() first!");
+            throw new RuntimeException("You must call TextToSpeechController.init() first!");
         }
 
         return sInstance;
@@ -127,7 +132,7 @@ public class TextToSpeechController implements ITextToSpeechController {
 
                 if (result == TextToSpeech.ERROR) {
                     Log.e(TAG, "TextToSpeech.speak() failed!");
-                    // TODO: Implement some fallback
+                    MotorController.getInstance().start();
                 }
             } else {
                 mPendingOperations.add(output);

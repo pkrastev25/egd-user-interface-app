@@ -1,7 +1,6 @@
 package com.egd.userinterface.tests;
 
 import android.os.Handler;
-import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.constants.enums.SpeechRecognitionTypes;
@@ -21,18 +20,11 @@ import java.util.concurrent.TimeUnit;
 public class TestCases {
 
     /**
-     * Represents the class name, used only for debugging.
-     */
-    private static final String TAG = TestCases.class.getSimpleName();
-
-    /**
      * Simple test case for the {@link TextToSpeechController}.
      */
     public static void TextToSpeechControllerTest() {
-        Log.i(TAG, "TestCases.TextToSpeechControllerTest() call");
         TextToSpeechController.getInstance().speak("Hello, this is the text to speech feature from Android");
         TextToSpeechController.getInstance().speak("If you are hearing this, it successfully worked");
-        Log.i(TAG, "TestCases.TextToSpeechControllerTest() last call");
     }
 
     /**
@@ -40,8 +32,6 @@ public class TestCases {
      * turns them off after 30 seconds.
      */
     public static void LEDControllerTest() {
-        Log.i(TAG, "TestCases.LEDControllerTest() call");
-
         final LEDController controller = new LEDController(
                 Constants.LED_GPIO_INPUT,
                 Constants.LED_GPIO_OUTPUT
@@ -53,9 +43,8 @@ public class TestCases {
             public void run() {
                 controller.LEDsOFF();
                 controller.clean();
-                Log.i(TAG, "TestCases.LEDControllerTest() last call");
             }
-        }, TimeUnit.SECONDS.toMillis(30));
+        }, TimeUnit.MINUTES.toMillis(1));
     }
 
     /**
@@ -63,13 +52,11 @@ public class TestCases {
      * and stops it after 1 second.
      */
     public static void MotorControllerTest() {
-        Log.i(TAG, "TestCases.MotorControllerTest() call");
         MotorController.getInstance().start();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 MotorController.getInstance().stop();
-                Log.i(TAG, "TestCases.MotorControllerTest() last call");
             }
         }, TimeUnit.MINUTES.toMillis(1));
     }
@@ -79,7 +66,11 @@ public class TestCases {
      * recognition and forwards the result to the {@link TextToSpeechController}.
      */
     public static void SpeechToTextControllerTest() {
-        Log.i(TAG, "TestCases.SpeechToTextControllerTest() call");
-        SpeechToTextController.getInstance().recognizeSpeech(SpeechRecognitionTypes.ALL_KEYWORDS);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SpeechToTextController.getInstance().recognizeSpeech(SpeechRecognitionTypes.ALL_KEYWORDS);
+            }
+        }, TimeUnit.MINUTES.toMillis(1));
     }
 }

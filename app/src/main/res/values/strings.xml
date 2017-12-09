@@ -10,6 +10,15 @@
 
     <!-- Generic feedback from the speech recognition -->
     <string name="speech_recognition_feedback_no_result">I understood nothing. Try again!</string>
+    <string name="speech_recognition_feedback_module_init_success">The speech recognition has successfully started.</string>
+    <string name="speech_recognition_feedback_module_init_error">An error occurred while starting the speech recognition module.</string>
+    <string name="speech_recognition_feedback_error">An error has occurred while recognizing the speech.</string>
 
     <!-- End of SPEECH RECOGNITION region -->
+
+    <!-- TEXT TO SPEECH region -->
+
+    <string name="text_to_speech_module_init_success">The text to speech module has successfully started.</string>
+
+    <!-- End of TEXT TO SPEECH region -->
 </resources>

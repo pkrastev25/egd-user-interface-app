@@ -2,7 +2,6 @@ package com.egd.userinterface.app;
 
 import android.app.Application;
 
-import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MotorController;
 import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
@@ -21,8 +20,8 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        MotorController.initialize();
-        TextToSpeechController.initialize(this);
-        SpeechToTextController.initialize(this);
+        MotorController.init();
+        TextToSpeechController.init(this);
+        SpeechToTextController.init(this);
     }
 }

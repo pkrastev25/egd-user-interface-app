@@ -42,6 +42,7 @@ public class SpeechToTextController implements ISpeechToTextController {
     private static ISpeechToTextController sInstance;
 
     private SpeechRecognizer mSpeechRecognizer;
+    private Context mContext;
 
     // INPUT/OUTPUT helpers
     private Gpio mInput;
@@ -58,11 +59,6 @@ public class SpeechToTextController implements ISpeechToTextController {
     private Map<String, String> mKeywordContainer;
 
     /**
-     * Contains the feedback given to the user if the speech recognition process failed.
-     */
-    private String mNoResultFeedback;
-
-    /**
      * Initializes the {@link SpeechRecognizer} by settings the acoustic model,
      * dictionary and language model of the English language. Configures a pin
      * as input according to {@link Constants#SPEECH_TO_TEXT_INPUT}.
@@ -70,8 +66,8 @@ public class SpeechToTextController implements ISpeechToTextController {
      * @param context {@link Context} reference
      */
     private SpeechToTextController(final Context context) {
+        mContext = context;
         mKeywordContainer = SpeechRecognitionUtil.mapWordsToSpeechRecognitionTypes(context);
-        mNoResultFeedback = context.getString(R.string.speech_recognition_feedback_no_result);
 
         mInputCallback = new GpioCallback() {
             @Override
@@ -146,19 +142,25 @@ public class SpeechToTextController implements ISpeechToTextController {
             @Override
             public void onSuccess(SpeechRecognizer speechRecognizer) {
                 if (speechRecognizer != null) {
-                    // TODO: Give some feedback to the user that he can speak now
                     mSpeechRecognizer = speechRecognizer;
                     mSpeechRecognizer.addListener(new RecognitionListenerImplementation());
                     mIsInitialized = true;
+                    TextToSpeechController.getInstance().speak(
+                            mContext.getString(R.string.speech_recognition_feedback_module_init_success)
+                    );
                 } else {
-                    // TODO: Implement some fallback
+                    TextToSpeechController.getInstance().speak(
+                            mContext.getString(R.string.speech_recognition_feedback_module_init_error)
+                    );
                 }
             }
 
             @Override
             public void onError(Exception error) {
-                // TODO: Implement some fallback
-                Log.e(TAG, "SpeechToTextController.initialize() failed!", error);
+                Log.e(TAG, "SpeechToTextController.init() failed!", error);
+                TextToSpeechController.getInstance().speak(
+                        mContext.getString(R.string.speech_recognition_feedback_module_init_error)
+                );
             }
         });
     }
@@ -170,7 +172,7 @@ public class SpeechToTextController implements ISpeechToTextController {
      *
      * @param context {@link Context} reference
      */
-    public static void initialize(Context context) {
+    public static void init(Context context) {
         if (sInstance == null) {
             synchronized (SpeechToTextController.class) {
                 if (sInstance == null) {
@@ -184,11 +186,11 @@ public class SpeechToTextController implements ISpeechToTextController {
      * Expose the only instance of {@link SpeechToTextController}.
      *
      * @return The {@link SpeechToTextController} instance
-     * @throws RuntimeException If {@link SpeechToTextController#initialize(Context)} is not called before this method
+     * @throws RuntimeException If {@link SpeechToTextController#init(Context)} is not called before this method
      */
     public static ISpeechToTextController getInstance() {
         if (sInstance == null) {
-            throw new RuntimeException("You must call SpeechToTextController.initialize() first!");
+            throw new RuntimeException("You must call SpeechToTextController.init() first!");
         }
 
         return sInstance;
@@ -202,10 +204,12 @@ public class SpeechToTextController implements ISpeechToTextController {
      */
     @Override
     public void recognizeSpeech(@SpeechRecognitionTypes String type) {
-        synchronized (SpeechToTextController.class) {
-            if (mIsInitialized && !mIsActive) {
-                mSpeechRecognizer.startListening(type, Constants.SPEECH_TO_TEXT_TIMEOUT);
-                mIsActive = true;
+        if (mIsInitialized && !mIsActive) {
+            synchronized (SpeechToTextController.class) {
+                if (mIsInitialized && !mIsActive) {
+                    mSpeechRecognizer.startListening(type, Constants.SPEECH_TO_TEXT_TIMEOUT);
+                    mIsActive = true;
+                }
             }
         }
     }
@@ -231,9 +235,8 @@ public class SpeechToTextController implements ISpeechToTextController {
 
         mInputCallback = null;
         mInput = null;
-        mIsInitialized = false;
-        mIsActive = false;
         sInstance = null;
+        mContext = null;
     }
 
     /**
@@ -296,7 +299,9 @@ public class SpeechToTextController implements ISpeechToTextController {
             mIsActive = false;
 
             if (hypothesis == null) {
-                TextToSpeechController.getInstance().speak(mNoResultFeedback);
+                TextToSpeechController.getInstance().speak(
+                        mContext.getString(R.string.speech_recognition_feedback_no_result)
+                );
                 return;
             }
 
@@ -305,7 +310,9 @@ public class SpeechToTextController implements ISpeechToTextController {
                     mSpeechRecognizer.startListening(mKeywordContainer.get(hypothesis.getHypstr()), Constants.SPEECH_TO_TEXT_TIMEOUT);
                     mIsActive = true;
                 } else {
-                    TextToSpeechController.getInstance().speak(mNoResultFeedback);
+                    TextToSpeechController.getInstance().speak(
+                            mContext.getString(R.string.speech_recognition_feedback_no_result)
+                    );
                 }
             } else {
                 Log.i(TAG, hypothesis.getHypstr());
@@ -320,6 +327,9 @@ public class SpeechToTextController implements ISpeechToTextController {
          */
         @Override
         public void onError(Exception e) {
+            TextToSpeechController.getInstance().speak(
+                    mContext.getString(R.string.speech_recognition_feedback_error)
+            );
             Log.e(TAG, "SpeechToTextController.onError()", e);
         }
 

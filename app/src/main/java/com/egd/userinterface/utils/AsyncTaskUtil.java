@@ -3,6 +3,7 @@ package com.egd.userinterface.utils;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Helper class for a {@link AsyncTask} which handles workload off the main working thread.
@@ -13,6 +14,11 @@ import android.support.annotation.Nullable;
  * @since 5.11.2017
  */
 public class AsyncTaskUtil extends AsyncTask<Void, Void, Object> {
+
+    /**
+     * Represents the class name, used only for debugging.
+     */
+    private static final String TAG = AsyncTaskUtil.class.getSimpleName();
 
     private IAsyncTaskListener mListener;
     private Exception mException;
@@ -71,7 +77,7 @@ public class AsyncTaskUtil extends AsyncTask<Void, Void, Object> {
             return mListener.onExecuteTask();
         } catch (Exception e) {
             mException = e;
-            e.printStackTrace();
+            Log.e(TAG, "AsyncTaskUtil.doInBackground() failed!", e);
         }
 
         return null;

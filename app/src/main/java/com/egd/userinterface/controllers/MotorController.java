@@ -85,7 +85,7 @@ public class MotorController implements IMotorController {
     /**
      * Initializes the {@link MotorController} instance.
      */
-    public static void initialize() {
+    public static void init() {
         if (sInstance == null) {
             synchronized (MotorController.class) {
                 if (sInstance == null) {
@@ -99,11 +99,11 @@ public class MotorController implements IMotorController {
      * Expose the only instance of {@link MotorController}.
      *
      * @return The {@link MotorController} instance
-     * @throws RuntimeException If {@link MotorController#initialize()} is not called before this method
+     * @throws RuntimeException If {@link MotorController#init()} is not called before this method
      */
     public static IMotorController getInstance() {
         if (sInstance == null) {
-            throw new RuntimeException("You must call MotorController.initialize() first!");
+            throw new RuntimeException("You must call MotorController.init() first!");
         }
 
         return sInstance;
@@ -114,13 +114,15 @@ public class MotorController implements IMotorController {
      */
     @Override
     public void start() {
-        synchronized (MotorController.class) {
-            mIsActive = true;
+        if (!mIsActive) {
+            synchronized (MotorController.class) {
+                mIsActive = true;
 
-            try {
-                mPWMOutput.setEnabled(true);
-            } catch (IOException e) {
-                Log.e(TAG, "MotorController.start() failed!", e);
+                try {
+                    mPWMOutput.setEnabled(true);
+                } catch (IOException e) {
+                    Log.e(TAG, "MotorController.start() failed!", e);
+                }
             }
         }
     }
@@ -130,13 +132,15 @@ public class MotorController implements IMotorController {
      */
     @Override
     public void stop() {
-        synchronized (MotorController.class) {
-            mIsActive = false;
+        if (mIsActive) {
+            synchronized (MotorController.class) {
+                mIsActive = false;
 
-            try {
-                mPWMOutput.setEnabled(false);
-            } catch (IOException e) {
-                Log.e(TAG, "MotorController.stop() failed!", e);
+                try {
+                    mPWMOutput.setEnabled(false);
+                } catch (IOException e) {
+                    Log.e(TAG, "MotorController.stop() failed!", e);
+                }
             }
         }
     }
@@ -164,6 +168,5 @@ public class MotorController implements IMotorController {
         mInput = null;
         mPWMOutput = null;
         sInstance = null;
-        mIsActive = false;
     }
 }
