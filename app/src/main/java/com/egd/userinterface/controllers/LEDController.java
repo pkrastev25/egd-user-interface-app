@@ -38,6 +38,9 @@ public class LEDController implements ILEDController {
 
     /**
      * Initializes the {@link LEDController}.
+     * Include a debouncing mechanism for the inputs which ignores all incoming
+     * interrupts for {@link Constants#GPIO_CALLBACK_SAMPLE_TIME_MS} after successfully
+     * detecting the 1st interrupt. Greatly improves performance!
      *
      * @param input The {@link Gpio} that will be configured as input
      * @param output The {@link Gpio} that will be configured as output
@@ -47,7 +50,6 @@ public class LEDController implements ILEDController {
         mInputCallback = new GpioCallback() {
             @Override
             public boolean onGpioEdge(Gpio gpio) {
-                // TODO: Verify if this is really needed
                 if (mShouldDetectEdge) {
                     mShouldDetectEdge = false;
 

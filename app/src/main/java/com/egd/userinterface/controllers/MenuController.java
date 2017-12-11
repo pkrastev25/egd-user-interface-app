@@ -1,7 +1,9 @@
 package com.egd.userinterface.controllers;
 
+import android.os.Handler;
 import android.util.Log;
 
+import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.constants.enums.GPIOEdgeTriggerType;
 import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPi;
 import com.egd.userinterface.controllers.models.IController;
@@ -25,8 +27,14 @@ public class MenuController implements IController {
     private Gpio mButton5;
     private Gpio mButton8;
 
+    private boolean mShouldDetectEdgeButton5;
+    private boolean mShouldDetectEdgeButton8;
+
     /**
      * TODO
+     * Include a debouncing mechanism for the inputs which ignores all incoming
+     * interrupts for {@link Constants#GPIO_CALLBACK_SAMPLE_TIME_MS} after successfully
+     * detecting the 1st interrupt. Greatly improves performance!
      *
      * @param button5
      * @param button8
@@ -40,7 +48,18 @@ public class MenuController implements IController {
                     new GpioCallback() {
                         @Override
                         public boolean onGpioEdge(Gpio gpio) {
-                            return super.onGpioEdge(gpio);
+                            if (mShouldDetectEdgeButton5) {
+                                mShouldDetectEdgeButton5 = false;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mShouldDetectEdgeButton5 = true;
+                                    }
+                                }, Constants.GPIO_CALLBACK_SAMPLE_TIME_MS);
+                            }
+
+                            return true;
                         }
                     }
             );
@@ -56,7 +75,18 @@ public class MenuController implements IController {
                     new GpioCallback() {
                         @Override
                         public boolean onGpioEdge(Gpio gpio) {
-                            return super.onGpioEdge(gpio);
+                            if (mShouldDetectEdgeButton8) {
+                                mShouldDetectEdgeButton8 = false;
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mShouldDetectEdgeButton8 = true;
+                                    }
+                                }, Constants.GPIO_CALLBACK_SAMPLE_TIME_MS);
+                            }
+
+                            return true;
                         }
                     }
             );

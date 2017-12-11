@@ -152,7 +152,6 @@ public class TextToSpeechController implements ITextToSpeechController {
         }
 
         sInstance = null;
-        mIsInitialized = false;
         mPendingOperations = null;
     }
 

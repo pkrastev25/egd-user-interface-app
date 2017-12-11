@@ -1,6 +1,7 @@
 package com.egd.userinterface.controllers;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -47,6 +48,7 @@ public class SpeechToTextController implements ISpeechToTextController {
     // INPUT/OUTPUT helpers
     private Gpio mInput;
     private GpioCallback mInputCallback;
+    private boolean mShouldDetectEdge;
 
     // STATE helpers
     private boolean mIsInitialized;
@@ -62,6 +64,9 @@ public class SpeechToTextController implements ISpeechToTextController {
      * Initializes the {@link SpeechRecognizer} by settings the acoustic model,
      * dictionary and language model of the English language. Configures a pin
      * as input according to {@link Constants#SPEECH_TO_TEXT_INPUT}.
+     * Include a debouncing mechanism for the inputs which ignores all incoming
+     * interrupts for {@link Constants#GPIO_CALLBACK_SAMPLE_TIME_MS} after successfully
+     * detecting the 1st interrupt. Greatly improves performance!
      *
      * @param context {@link Context} reference
      */
@@ -72,7 +77,18 @@ public class SpeechToTextController implements ISpeechToTextController {
         mInputCallback = new GpioCallback() {
             @Override
             public boolean onGpioEdge(Gpio gpio) {
-                recognizeSpeech(SpeechRecognitionTypes.ALL_KEYWORDS);
+                if (mShouldDetectEdge) {
+                    mShouldDetectEdge = false;
+
+                    recognizeSpeech(SpeechRecognitionTypes.ALL_KEYWORDS);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mShouldDetectEdge = true;
+                        }
+                    }, Constants.GPIO_CALLBACK_SAMPLE_TIME_MS);
+                }
 
                 return true;
             }

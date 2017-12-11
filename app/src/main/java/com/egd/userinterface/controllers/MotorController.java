@@ -1,5 +1,6 @@
 package com.egd.userinterface.controllers;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
@@ -34,20 +35,36 @@ public class MotorController implements IMotorController {
 
     // STATE helpers
     private boolean mIsActive;
+    private boolean mShouldDetectEdge;
 
     /**
      * Initializes the {@link MotorController}. Configures a pin as input
      * according to {@link Constants#MOTOR_GPIO_INPUT} and a pin as output
      * according to {@link Constants#MOTOR_GPIO_OUTPUT}.
+     * Include a debouncing mechanism for the inputs which ignores all incoming
+     * interrupts for {@link Constants#GPIO_CALLBACK_SAMPLE_TIME_MS} after successfully
+     * detecting the 1st interrupt. Greatly improves performance!
      */
     private MotorController() {
+        mShouldDetectEdge = true;
         mInputCallback = new GpioCallback() {
             @Override
             public boolean onGpioEdge(Gpio gpio) {
-                if (mIsActive) {
-                    stop();
-                } else {
-                    start();
+                if (mShouldDetectEdge) {
+                    mShouldDetectEdge = false;
+
+                    if (mIsActive) {
+                        stop();
+                    } else {
+                        start();
+                    }
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mShouldDetectEdge = true;
+                        }
+                    }, Constants.GPIO_CALLBACK_SAMPLE_TIME_MS);
                 }
 
                 return true;
@@ -116,12 +133,14 @@ public class MotorController implements IMotorController {
     public void start() {
         if (!mIsActive) {
             synchronized (MotorController.class) {
-                mIsActive = true;
+                if (!mIsActive) {
+                    mIsActive = true;
 
-                try {
-                    mPWMOutput.setEnabled(true);
-                } catch (IOException e) {
-                    Log.e(TAG, "MotorController.start() failed!", e);
+                    try {
+                        mPWMOutput.setEnabled(true);
+                    } catch (IOException e) {
+                        Log.e(TAG, "MotorController.start() failed!", e);
+                    }
                 }
             }
         }
@@ -134,12 +153,14 @@ public class MotorController implements IMotorController {
     public void stop() {
         if (mIsActive) {
             synchronized (MotorController.class) {
-                mIsActive = false;
+                if (mIsActive) {
+                    mIsActive = false;
 
-                try {
-                    mPWMOutput.setEnabled(false);
-                } catch (IOException e) {
-                    Log.e(TAG, "MotorController.stop() failed!", e);
+                    try {
+                        mPWMOutput.setEnabled(false);
+                    } catch (IOException e) {
+                        Log.e(TAG, "MotorController.stop() failed!", e);
+                    }
                 }
             }
         }
