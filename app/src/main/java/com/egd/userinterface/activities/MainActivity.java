@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private  BluetoothDistanceDetector bluetoothDetector;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bluetoothDetector = new BluetoothDistanceDetector();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -44,17 +43,19 @@ public class MainActivity extends AppCompatActivity {
                 Constants.MENU_INPUT_BUTTON_5,
                 Constants.MENU_INPUT_BUTTON_8
         );
+        bluetoothDetector = new BluetoothDistanceDetector();
 
         // Init just in case the activity got destroyed
         MotorController.init();
+        bluetoothDetector.init(this);
         TextToSpeechController.init(this);
         SpeechToTextController.init(this);
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        bluetoothDetector.init();
         /*
          * Test cases below. Uncomment if a certain module must be tested!
          */

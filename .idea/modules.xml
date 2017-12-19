@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/egd-user-interface.iml" filepath="$PROJECT_DIR$/egd-user-interface.iml" />
       <module fileurl="file://$PROJECT_DIR$/pocketsphinx/pocketsphinx.iml" filepath="$PROJECT_DIR$/pocketsphinx/pocketsphinx.iml" />
+      <module fileurl="file://D:\1_Univ\1_CJ2_EGD_Leutelt\GitHub\egd-user-interface\pocketsphinx\pocketsphinx.iml" filepath="D:\1_Univ\1_CJ2_EGD_Leutelt\GitHub\egd-user-interface\pocketsphinx\pocketsphinx.iml" />
     </modules>
   </component>
 </project>
