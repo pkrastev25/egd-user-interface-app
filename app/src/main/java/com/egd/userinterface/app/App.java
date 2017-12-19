@@ -2,6 +2,8 @@ package com.egd.userinterface.app;
 
 import android.app.Application;
 
+import com.egd.userinterface.controllers.MotorController;
+import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
 
 /**
@@ -18,15 +20,8 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        TextToSpeechController.initialize(this);
-    }
-
-
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-
-        TextToSpeechController.getInstance().clear();
+        MotorController.init();
+        TextToSpeechController.init(this);
+        SpeechToTextController.init(this);
     }
 }

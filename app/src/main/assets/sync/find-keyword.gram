@@ -1,0 +1,5 @@
+#JSGF V1.0;
+
+grammar find;
+
+public <item> = elevator | traffic light | bus number;
