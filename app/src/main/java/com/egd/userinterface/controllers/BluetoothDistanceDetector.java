@@ -7,11 +7,13 @@ package com.egd.userinterface.controllers;
         import android.bluetooth.BluetoothAdapter;
         import android.bluetooth.BluetoothDevice;
         import android.bluetooth.BluetoothProfile;
+        import android.bluetooth.le.*;
         import android.content.BroadcastReceiver;
         import android.content.Context;
         import android.content.Intent;
         import android.content.IntentFilter;
         import android.util.Log;
+        import android.os.AsyncTask;
 
         import java.util.Set;
         import java.util.Timer;
@@ -23,7 +25,7 @@ public class BluetoothDistanceDetector
     private static final String ADAPTER_FRIENDLY_NAME = "My Raspberry EGD Device";
     private static final String TAG = "BlutoothDistanceDetector";
     private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothProfile mA2DPSinkProxy;
+    private BluetoothLeScanner mBluetoothScanner;
     private Context localContext;
 
     //during connection estblishing
@@ -31,19 +33,73 @@ public class BluetoothDistanceDetector
     //for checking if devices is connected or in range
     private long bluetoothDiscoveryPeriod = 20000; //ms
 
-    private int SIGNAL_STRENGTH_THRESHOLD = 99999;
+    private int SIGNAL_STRENGTH_THRESHOLD = -90;
+    private String PairedDeviceAddress = "EB:D4:89:BC:B2:9D";
 
     private Timer bluetoothTimer = new Timer();
 
+    private boolean isDeviceFound = true;
+
     //searching and pairing devices
     private Set<BluetoothDevice> pairedDevices;
+
+    private ScanCallback BLE_Callback = new ScanCallback() {
+
+
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+
+            if(result.getDevice().getAddress().equals(PairedDeviceAddress)){
+                Log.i(TAG,"Device Address: " + result.getDevice().getAddress() + " Device Name: " + result.getDevice().getName() +  " rssi: " + result.getRssi() + "\n");
+                if(result.getRssi()>SIGNAL_STRENGTH_THRESHOLD){
+                    isDeviceFound=true;
+                }
+            }
+        }
+    };
+
+
+    //Log.i(TAG, "Now we are together again!");
+    //Log.i(TAG, "Found owner by address!");
+
+    private void checkConnectionStatus(){
+        if(!isDeviceFound){
+            Log.i(TAG, "You have forgotten me!");
+        } else {
+            Log.i(TAG, "Now we are connected!");
+        }
+        isDeviceFound=false;
+    }
+
     private TimerTask bluetoothSearch = new TimerTask() {
     synchronized public void run() {
-        pairedDevices= mBluetoothAdapter.getBondedDevices();
-        if (mBluetoothAdapter.isDiscovering()) {
-            mBluetoothAdapter.cancelDiscovery();
-        }
-        mBluetoothAdapter.startDiscovery();
+
+        checkConnectionStatus();
+       // pairedDevices= mBluetoothAdapter.getBondedDevices();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                mBluetoothScanner.startScan(BLE_Callback);
+            }
+        });
+
+//        for(BluetoothDevice bd : pairedDevices){
+//
+//            String a = bd.getName();
+//            if (a!=null) {
+//                Log.i(TAG,bd.getName());
+//
+//            }
+//            Log.i(TAG,bd.getAddress());
+//        }
+
+        //mBluetoothScanner.stopScan(BLE_Callback);
+       // mBluetoothScanner.startScan(BLE_Callback);
+//        if (mBluetoothAdapter.isDiscovering()) {
+//        //    mBluetoothAdapter.cancelDiscovery();
+//        } else {
+//            mBluetoothAdapter.startDiscovery();
+//        }
     }
 
 };
@@ -58,16 +114,15 @@ public class BluetoothDistanceDetector
         }
         Log.d(TAG, "Set up Bluetooth Adapter name and profile");
         mBluetoothAdapter.setName(ADAPTER_FRIENDLY_NAME);
-        mBluetoothAdapter.getProfileProxy(localContext, new BluetoothProfile.ServiceListener() {
-            @Override
-            public void onServiceConnected(int profile, BluetoothProfile proxy) {
-                mA2DPSinkProxy = proxy;
-                enableDiscoverable(localContext);
-            }
-            @Override
-            public void onServiceDisconnected(int profile) {
-            }
-        }, 11);
+//        mBluetoothAdapter.getProfileProxy(localContext, new BluetoothProfile.ServiceListener() {
+//            @Override
+//            public void onServiceConnected(int profile, BluetoothProfile proxy) {
+//                enableDiscoverable(localContext);
+//            }
+//            @Override
+//            public void onServiceDisconnected(int profile) {
+//            }
+//        }, 11);
     }
 
     //discovering devices with bluetooth
@@ -96,26 +151,14 @@ public class BluetoothDistanceDetector
             mBluetoothAdapter.enable();
         }
 
-        BluetoothReceiver blReceiver = new BluetoothReceiver();
-        localContext.registerReceiver(blReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+//        BluetoothReceiver blReceiver = new BluetoothReceiver();
+        mBluetoothScanner = mBluetoothAdapter.getBluetoothLeScanner();
+//        localContext.registerReceiver(blReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
 
         bluetoothTimer.scheduleAtFixedRate(bluetoothSearch, bluetoothDiscoveryDelay, bluetoothDiscoveryPeriod);
     }
 
-    // launch discovery every 10 seconds or so
-    class BluetoothReceiver extends BroadcastReceiver{
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if(BluetoothDevice.ACTION_FOUND.equals(action)){
-                int  rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
-                //should check name here
-                Log.i(TAG, "Signal strength:" + rssi);
-
-            }
-        }
-    };
 
 
 }
