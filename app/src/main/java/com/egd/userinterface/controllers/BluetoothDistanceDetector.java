@@ -1,17 +1,14 @@
 package com.egd.userinterface.controllers;
 
 /**
- * Created by Evgeniy Bond on 11.11.2017.
+ * Created by Evgeniy Bond on 19.12.2017.
  */
 
         import android.bluetooth.BluetoothAdapter;
         import android.bluetooth.BluetoothDevice;
-        import android.bluetooth.BluetoothProfile;
         import android.bluetooth.le.*;
-        import android.content.BroadcastReceiver;
         import android.content.Context;
         import android.content.Intent;
-        import android.content.IntentFilter;
         import android.util.Log;
         import android.os.AsyncTask;
 
@@ -26,7 +23,6 @@ public class BluetoothDistanceDetector
     private static final String TAG = "BlutoothDistanceDetector";
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothScanner;
-    private Context localContext;
 
     //during connection estblishing
     private long bluetoothDiscoveryDelay = 4000; //ms
@@ -45,7 +41,6 @@ public class BluetoothDistanceDetector
 
     private ScanCallback BLE_Callback = new ScanCallback() {
 
-
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
 
@@ -57,10 +52,6 @@ public class BluetoothDistanceDetector
             }
         }
     };
-
-
-    //Log.i(TAG, "Now we are together again!");
-    //Log.i(TAG, "Found owner by address!");
 
     private void checkConnectionStatus(){
         if(!isDeviceFound){
@@ -82,24 +73,6 @@ public class BluetoothDistanceDetector
                 mBluetoothScanner.startScan(BLE_Callback);
             }
         });
-
-//        for(BluetoothDevice bd : pairedDevices){
-//
-//            String a = bd.getName();
-//            if (a!=null) {
-//                Log.i(TAG,bd.getName());
-//
-//            }
-//            Log.i(TAG,bd.getAddress());
-//        }
-
-        //mBluetoothScanner.stopScan(BLE_Callback);
-       // mBluetoothScanner.startScan(BLE_Callback);
-//        if (mBluetoothAdapter.isDiscovering()) {
-//        //    mBluetoothAdapter.cancelDiscovery();
-//        } else {
-//            mBluetoothAdapter.startDiscovery();
-//        }
     }
 
 };
@@ -114,15 +87,6 @@ public class BluetoothDistanceDetector
         }
         Log.d(TAG, "Set up Bluetooth Adapter name and profile");
         mBluetoothAdapter.setName(ADAPTER_FRIENDLY_NAME);
-//        mBluetoothAdapter.getProfileProxy(localContext, new BluetoothProfile.ServiceListener() {
-//            @Override
-//            public void onServiceConnected(int profile, BluetoothProfile proxy) {
-//                enableDiscoverable(localContext);
-//            }
-//            @Override
-//            public void onServiceDisconnected(int profile) {
-//            }
-//        }, 11);
     }
 
     //discovering devices with bluetooth
@@ -135,8 +99,7 @@ public class BluetoothDistanceDetector
         localContext.startActivity(discoverableIntent);
     }
 
-    public void init(Context newContext) {
-        this.localContext = newContext;
+    public void init() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "No default Bluetooth adapter. Device likely does not support bluetooth.");
@@ -151,15 +114,10 @@ public class BluetoothDistanceDetector
             mBluetoothAdapter.enable();
         }
 
-//        BluetoothReceiver blReceiver = new BluetoothReceiver();
         mBluetoothScanner = mBluetoothAdapter.getBluetoothLeScanner();
-//        localContext.registerReceiver(blReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-
 
         bluetoothTimer.scheduleAtFixedRate(bluetoothSearch, bluetoothDiscoveryDelay, bluetoothDiscoveryPeriod);
     }
-
-
 
 }
 
