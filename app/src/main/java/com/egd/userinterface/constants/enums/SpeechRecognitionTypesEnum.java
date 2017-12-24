@@ -14,12 +14,12 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.SOURCE)
 @StringDef({
-        SpeechRecognitionTypes.ALL_KEYWORDS,
-        SpeechRecognitionTypes.FIND_KEYWORD,
-        SpeechRecognitionTypes.NAVIGATE_KEYWORD,
-        SpeechRecognitionTypes.TEST_KEYWORD
+        SpeechRecognitionTypesEnum.ALL_KEYWORDS,
+        SpeechRecognitionTypesEnum.FIND_KEYWORD,
+        SpeechRecognitionTypesEnum.NAVIGATE_KEYWORD,
+        SpeechRecognitionTypesEnum.TEST_KEYWORD
 })
-public @interface SpeechRecognitionTypes {
+public @interface SpeechRecognitionTypesEnum {
 
     /**
      * Specifies that the {@link com.egd.userinterface.controllers.SpeechToTextController}

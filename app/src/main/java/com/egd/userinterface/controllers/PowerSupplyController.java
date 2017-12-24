@@ -2,7 +2,7 @@ package com.egd.userinterface.controllers;
 
 import android.util.Log;
 
-import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPi;
+import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPiEnum;
 import com.egd.userinterface.controllers.models.IController;
 import com.egd.userinterface.utils.GPIOUtil;
 import com.google.android.things.pio.Gpio;
@@ -32,7 +32,7 @@ public class PowerSupplyController implements IController {
      *
      * @param pin The pin which will be configured as the power source
      */
-    public PowerSupplyController(@GPIOPortsRaspberryPi String pin) {
+    public PowerSupplyController(@GPIOPortsRaspberryPiEnum String pin) {
         try {
             mPowerSupply = GPIOUtil.configureOutputGPIO(
                     pin,

@@ -146,13 +146,19 @@ public class TextToSpeechController implements ITextToSpeechController {
      */
     @Override
     public void clean() {
-        if (mTextToSpeech != null) {
-            mTextToSpeech.shutdown();
-            mTextToSpeech = null;
-        }
+        if (sInstance == null) {
+            synchronized (this) {
+                if (sInstance == null) {
+                    if (mTextToSpeech != null) {
+                        mTextToSpeech.shutdown();
+                        mTextToSpeech = null;
+                    }
 
-        sInstance = null;
-        mPendingOperations = null;
+                    mPendingOperations = null;
+                    sInstance = null;
+                }
+            }
+        }
     }
 
     /**

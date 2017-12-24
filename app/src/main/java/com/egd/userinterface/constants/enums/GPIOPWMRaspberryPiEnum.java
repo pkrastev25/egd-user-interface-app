@@ -14,22 +14,22 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.SOURCE)
 @StringDef({
-        GPIOPWMRaspberryPi.PWM_PIN12,
-        GPIOPWMRaspberryPi.PWM_PIN33
+        GPIOPWMRaspberryPiEnum.PWM_PIN12,
+        GPIOPWMRaspberryPiEnum.PWM_PIN33
 })
-public @interface GPIOPWMRaspberryPi {
+public @interface GPIOPWMRaspberryPiEnum {
 
     /**
      * Represents pin 12 on the board which can be used as a PWM output.
      *
-     * @see GPIOPortsRaspberryPi#GPIO_PIN12
+     * @see GPIOPortsRaspberryPiEnum#GPIO_PIN12
      */
     String PWM_PIN12 = "PWM0";
 
     /**
      * Represents pin 33 on the board which can be used as a PWM output.
      *
-     * @see GPIOPortsRaspberryPi#GPIO_PIN33
+     * @see GPIOPortsRaspberryPiEnum#GPIO_PIN33
      */
     String PWM_PIN33 = "PWM1";
 }

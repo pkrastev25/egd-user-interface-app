@@ -4,8 +4,8 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
-import com.egd.userinterface.constants.enums.GPIOEdgeTriggerType;
-import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPi;
+import com.egd.userinterface.constants.enums.GPIOEdgeTriggerTypesEnum;
+import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPiEnum;
 import com.egd.userinterface.controllers.models.ILEDController;
 import com.egd.userinterface.utils.GPIOUtil;
 import com.google.android.things.pio.Gpio;
@@ -45,7 +45,7 @@ public class LEDController implements ILEDController {
      * @param input The {@link Gpio} that will be configured as input
      * @param output The {@link Gpio} that will be configured as output
      */
-    public LEDController(@GPIOPortsRaspberryPi String input, @GPIOPortsRaspberryPi String output) {
+    public LEDController(@GPIOPortsRaspberryPiEnum String input, @GPIOPortsRaspberryPiEnum String output) {
         mShouldDetectEdge = true;
         mInputCallback = new GpioCallback() {
             @Override
@@ -81,7 +81,7 @@ public class LEDController implements ILEDController {
             mInput = GPIOUtil.configureInputGPIO(
                     input,
                     true,
-                    GPIOEdgeTriggerType.EDGE_RISING,
+                    GPIOEdgeTriggerTypesEnum.EDGE_RISING,
                     mInputCallback
             );
         } catch (IOException e) {

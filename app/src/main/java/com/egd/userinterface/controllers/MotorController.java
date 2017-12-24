@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
-import com.egd.userinterface.constants.enums.GPIOEdgeTriggerType;
+import com.egd.userinterface.constants.enums.GPIOEdgeTriggerTypesEnum;
 import com.egd.userinterface.controllers.models.IMotorController;
 import com.egd.userinterface.utils.GPIOUtil;
 import com.google.android.things.pio.Gpio;
@@ -81,7 +81,7 @@ public class MotorController implements IMotorController {
             mInput = GPIOUtil.configureInputGPIO(
                     Constants.MOTOR_GPIO_INPUT,
                     true,
-                    GPIOEdgeTriggerType.EDGE_RISING,
+                    GPIOEdgeTriggerTypesEnum.EDGE_RISING,
                     mInputCallback
             );
         } catch (IOException e) {

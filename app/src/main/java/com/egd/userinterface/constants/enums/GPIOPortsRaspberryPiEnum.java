@@ -14,34 +14,34 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.SOURCE)
 @StringDef({
-        GPIOPortsRaspberryPi.GPIO_PIN3,
-        GPIOPortsRaspberryPi.GPIO_PIN5,
-        GPIOPortsRaspberryPi.GPIO_PIN7,
-        GPIOPortsRaspberryPi.GPIO_PIN29,
-        GPIOPortsRaspberryPi.GPIO_PIN31,
-        GPIOPortsRaspberryPi.GPIO_PIN26,
-        GPIOPortsRaspberryPi.GPIO_PIN24,
-        GPIOPortsRaspberryPi.GPIO_PIN21,
-        GPIOPortsRaspberryPi.GPIO_PIN19,
-        GPIOPortsRaspberryPi.GPIO_PIN23,
-        GPIOPortsRaspberryPi.GPIO_PIN32,
-        GPIOPortsRaspberryPi.GPIO_PIN33,
-        GPIOPortsRaspberryPi.GPIO_PIN8,
-        GPIOPortsRaspberryPi.GPIO_PIN10,
-        GPIOPortsRaspberryPi.GPIO_PIN36,
-        GPIOPortsRaspberryPi.GPIO_PIN11,
-        GPIOPortsRaspberryPi.GPIO_PIN12,
-        GPIOPortsRaspberryPi.GPIO_PIN35,
-        GPIOPortsRaspberryPi.GPIO_PIN38,
-        GPIOPortsRaspberryPi.GPIO_PIN40,
-        GPIOPortsRaspberryPi.GPIO_PIN15,
-        GPIOPortsRaspberryPi.GPIO_PIN16,
-        GPIOPortsRaspberryPi.GPIO_PIN18,
-        GPIOPortsRaspberryPi.GPIO_PIN22,
-        GPIOPortsRaspberryPi.GPIO_PIN37,
-        GPIOPortsRaspberryPi.GPIO_PIN13
+        GPIOPortsRaspberryPiEnum.GPIO_PIN3,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN5,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN7,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN29,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN31,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN26,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN24,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN21,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN19,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN23,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN32,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN33,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN8,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN10,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN36,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN11,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN12,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN35,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN38,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN40,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN15,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN16,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN18,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN22,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN37,
+        GPIOPortsRaspberryPiEnum.GPIO_PIN13
 })
-public @interface GPIOPortsRaspberryPi {
+public @interface GPIOPortsRaspberryPiEnum {
 
     /**
      * Represents a GPIO port on the board. Contains the alternate

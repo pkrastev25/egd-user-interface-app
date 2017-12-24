@@ -15,13 +15,13 @@ import java.lang.annotation.RetentionPolicy;
  * @since 6.11.2017
  */
 @IntDef({
-        GPIOEdgeTriggerType.EDGE_NONE,
-        GPIOEdgeTriggerType.EDGE_RISING,
-        GPIOEdgeTriggerType.EDGE_FALLING,
-        GPIOEdgeTriggerType.EDGE_BOTH
+        GPIOEdgeTriggerTypesEnum.EDGE_NONE,
+        GPIOEdgeTriggerTypesEnum.EDGE_RISING,
+        GPIOEdgeTriggerTypesEnum.EDGE_FALLING,
+        GPIOEdgeTriggerTypesEnum.EDGE_BOTH
 })
 @Retention(RetentionPolicy.SOURCE)
-public @interface GPIOEdgeTriggerType {
+public @interface GPIOEdgeTriggerTypesEnum {
 
     /**
      * Represents {@link Gpio#EDGE_NONE} as an edge trigger type for

@@ -3,7 +3,7 @@ package com.egd.userinterface.tests;
 import android.os.Handler;
 
 import com.egd.userinterface.constants.Constants;
-import com.egd.userinterface.constants.enums.SpeechRecognitionTypes;
+import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnum;
 import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MotorController;
 import com.egd.userinterface.controllers.SpeechToTextController;
@@ -69,7 +69,7 @@ public class TestCases {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                SpeechToTextController.getInstance().recognizeSpeech(SpeechRecognitionTypes.ALL_KEYWORDS);
+                SpeechToTextController.getInstance().recognizeSpeech(SpeechRecognitionTypesEnum.ALL_KEYWORDS);
             }
         }, TimeUnit.MINUTES.toMillis(1));
     }

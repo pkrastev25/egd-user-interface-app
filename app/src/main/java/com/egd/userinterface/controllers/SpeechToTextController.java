@@ -7,8 +7,8 @@ import android.util.Log;
 
 import com.egd.userinterface.R;
 import com.egd.userinterface.constants.Constants;
-import com.egd.userinterface.constants.enums.GPIOEdgeTriggerType;
-import com.egd.userinterface.constants.enums.SpeechRecognitionTypes;
+import com.egd.userinterface.constants.enums.GPIOEdgeTriggerTypesEnum;
+import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnum;
 import com.egd.userinterface.controllers.models.ISpeechToTextController;
 import com.egd.userinterface.utils.AsyncTaskUtil;
 import com.egd.userinterface.utils.GPIOUtil;
@@ -55,8 +55,8 @@ public class SpeechToTextController implements ISpeechToTextController {
     private boolean mIsActive;
 
     /**
-     * Map where the key is the translation of the given {@link SpeechRecognitionTypes}
-     * type and the value is the {@link SpeechRecognitionTypes} type itself.
+     * Map where the key is the translation of the given {@link SpeechRecognitionTypesEnum}
+     * type and the value is the {@link SpeechRecognitionTypesEnum} type itself.
      */
     private Map<String, String> mKeywordContainer;
 
@@ -80,7 +80,7 @@ public class SpeechToTextController implements ISpeechToTextController {
                 if (mShouldDetectEdge) {
                     mShouldDetectEdge = false;
 
-                    recognizeSpeech(SpeechRecognitionTypes.ALL_KEYWORDS);
+                    recognizeSpeech(SpeechRecognitionTypesEnum.ALL_KEYWORDS);
 
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -104,7 +104,7 @@ public class SpeechToTextController implements ISpeechToTextController {
             mInput = GPIOUtil.configureInputGPIO(
                     Constants.SPEECH_TO_TEXT_INPUT,
                     true,
-                    GPIOEdgeTriggerType.EDGE_RISING,
+                    GPIOEdgeTriggerTypesEnum.EDGE_RISING,
                     mInputCallback
             );
         } catch (IOException e) {
@@ -130,26 +130,26 @@ public class SpeechToTextController implements ISpeechToTextController {
 
                 // Include a search option for the keywords
                 speechRecognizer.addKeywordSearch(
-                        SpeechRecognitionTypes.ALL_KEYWORDS,
-                        SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypes.ALL_KEYWORDS, locale)
+                        SpeechRecognitionTypesEnum.ALL_KEYWORDS,
+                        SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.ALL_KEYWORDS, locale)
                 );
 
                 // Include a search option for the find keyword context
                 speechRecognizer.addGrammarSearch(
-                        SpeechRecognitionTypes.FIND_KEYWORD,
-                        SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypes.FIND_KEYWORD, locale)
+                        SpeechRecognitionTypesEnum.FIND_KEYWORD,
+                        SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.FIND_KEYWORD, locale)
                 );
 
                 // Include a search option for the navigate keyword context
                 speechRecognizer.addGrammarSearch(
-                        SpeechRecognitionTypes.NAVIGATE_KEYWORD,
-                        SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypes.NAVIGATE_KEYWORD, locale)
+                        SpeechRecognitionTypesEnum.NAVIGATE_KEYWORD,
+                        SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.NAVIGATE_KEYWORD, locale)
                 );
 
                 // Include a search option for the navigate keyword context
                 speechRecognizer.addNgramSearch(
-                        SpeechRecognitionTypes.TEST_KEYWORD,
-                        SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypes.TEST_KEYWORD, locale)
+                        SpeechRecognitionTypesEnum.TEST_KEYWORD,
+                        SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.TEST_KEYWORD, locale)
                 );
 
                 return speechRecognizer;
@@ -216,15 +216,15 @@ public class SpeechToTextController implements ISpeechToTextController {
      * Attempts to convert the speech input by the user into an equivalent
      * text format.
      *
-     * @param type The type of content, the recognizer needs to do, must be one of type {@link SpeechRecognitionTypes}
+     * @param type The type of content, the recognizer needs to do, must be one of type {@link SpeechRecognitionTypesEnum}
      */
     @Override
-    public void recognizeSpeech(@SpeechRecognitionTypes String type) {
+    public void recognizeSpeech(@SpeechRecognitionTypesEnum String type) {
         if (mIsInitialized && !mIsActive) {
             synchronized (SpeechToTextController.class) {
                 if (mIsInitialized && !mIsActive) {
-                    mSpeechRecognizer.startListening(type, Constants.SPEECH_TO_TEXT_TIMEOUT);
                     mIsActive = true;
+                    mSpeechRecognizer.startListening(type, Constants.SPEECH_TO_TEXT_TIMEOUT);
                 }
             }
         }
@@ -236,23 +236,29 @@ public class SpeechToTextController implements ISpeechToTextController {
      */
     @Override
     public void clean() {
-        if (mSpeechRecognizer != null) {
-            mSpeechRecognizer.cancel();
-            mSpeechRecognizer.shutdown();
-            mSpeechRecognizer = null;
-        }
+        if (sInstance == null) {
+            synchronized (this) {
+                if (sInstance == null) {
+                    if (mSpeechRecognizer != null) {
+                        mSpeechRecognizer.cancel();
+                        mSpeechRecognizer.shutdown();
+                        mSpeechRecognizer = null;
+                    }
 
-        try {
-            mInput.unregisterGpioCallback(mInputCallback);
-            mInput.close();
-        } catch (Exception e) {
-            Log.e(TAG, "SpeechToTextController.clean() failed!", e);
-        }
+                    try {
+                        mInput.unregisterGpioCallback(mInputCallback);
+                        mInput.close();
+                    } catch (Exception e) {
+                        Log.e(TAG, "SpeechToTextController.clean() failed!", e);
+                    }
 
-        mInputCallback = null;
-        mInput = null;
-        sInstance = null;
-        mContext = null;
+                    mInputCallback = null;
+                    mInput = null;
+                    sInstance = null;
+                    mContext = null;
+                }
+            }
+        }
     }
 
     /**
@@ -278,7 +284,7 @@ public class SpeechToTextController implements ISpeechToTextController {
         public void onEndOfSpeech() {
             Log.i(TAG, "SpeechToTextController.onEndOfSpeech()");
 
-            if (!SpeechRecognitionTypes.ALL_KEYWORDS.equals(mSpeechRecognizer.getSearchName())) {
+            if (!SpeechRecognitionTypesEnum.ALL_KEYWORDS.equals(mSpeechRecognizer.getSearchName())) {
                 mSpeechRecognizer.stop();
             }
         }
@@ -318,10 +324,11 @@ public class SpeechToTextController implements ISpeechToTextController {
                 TextToSpeechController.getInstance().speak(
                         mContext.getString(R.string.speech_recognition_feedback_no_result)
                 );
+
                 return;
             }
 
-            if (SpeechRecognitionTypes.ALL_KEYWORDS.equals(mSpeechRecognizer.getSearchName())) {
+            if (SpeechRecognitionTypesEnum.ALL_KEYWORDS.equals(mSpeechRecognizer.getSearchName())) {
                 if (mKeywordContainer.get(hypothesis.getHypstr()) != null) {
                     mSpeechRecognizer.startListening(mKeywordContainer.get(hypothesis.getHypstr()), Constants.SPEECH_TO_TEXT_TIMEOUT);
                     mIsActive = true;
@@ -343,6 +350,7 @@ public class SpeechToTextController implements ISpeechToTextController {
          */
         @Override
         public void onError(Exception e) {
+            mIsActive = false;
             TextToSpeechController.getInstance().speak(
                     mContext.getString(R.string.speech_recognition_feedback_error)
             );

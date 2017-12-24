@@ -4,8 +4,8 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.egd.userinterface.constants.Constants;
-import com.egd.userinterface.constants.enums.GPIOEdgeTriggerType;
-import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPi;
+import com.egd.userinterface.constants.enums.GPIOEdgeTriggerTypesEnum;
+import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPiEnum;
 import com.egd.userinterface.controllers.models.IController;
 import com.egd.userinterface.utils.GPIOUtil;
 import com.google.android.things.pio.Gpio;
@@ -39,12 +39,12 @@ public class MenuController implements IController {
      * @param button5
      * @param button8
      */
-    public MenuController(@GPIOPortsRaspberryPi String button5, @GPIOPortsRaspberryPi String button8) {
+    public MenuController(@GPIOPortsRaspberryPiEnum String button5, @GPIOPortsRaspberryPiEnum String button8) {
         try {
             mButton5 = GPIOUtil.configureInputGPIO(
                     button5,
                     true,
-                    GPIOEdgeTriggerType.EDGE_RISING,
+                    GPIOEdgeTriggerTypesEnum.EDGE_RISING,
                     new GpioCallback() {
                         @Override
                         public boolean onGpioEdge(Gpio gpio) {
@@ -71,7 +71,7 @@ public class MenuController implements IController {
             mButton8 = GPIOUtil.configureInputGPIO(
                     button8,
                     true,
-                    GPIOEdgeTriggerType.EDGE_RISING,
+                    GPIOEdgeTriggerTypesEnum.EDGE_RISING,
                     new GpioCallback() {
                         @Override
                         public boolean onGpioEdge(Gpio gpio) {
