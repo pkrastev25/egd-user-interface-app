@@ -15,7 +15,7 @@ import java.io.IOException;
 
 /**
  * Helper class used to manage the state of the external LEDs. Internally
- * used {@link Gpio} to realize the functionality.
+ * it uses {@link Gpio} to realize the functionality.
  *
  * @author Petar Krastev
  * @since 10.11.2017
@@ -38,7 +38,7 @@ public class LEDController implements ILEDController {
 
     /**
      * Initializes the {@link LEDController}.
-     * Include a debouncing mechanism for the inputs which ignores all incoming
+     * Includes a debouncing mechanism for the inputs which ignores all incoming
      * interrupts for {@link Constants#GPIO_CALLBACK_SAMPLE_TIME_MS} after successfully
      * detecting the 1st interrupt. Greatly improves performance!
      *

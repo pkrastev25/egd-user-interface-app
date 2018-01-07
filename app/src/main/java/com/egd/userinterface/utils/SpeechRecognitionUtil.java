@@ -22,7 +22,7 @@ public class SpeechRecognitionUtil {
     /**
      * Provides the correct {@link File} resource for the {@link SpeechRecognitionTypesEnum}
      * used by the {@link com.egd.userinterface.controllers.SpeechToTextController}. The
-     * {@link File} resource returned is adjust to the {@link Locale}.
+     * {@link File} resource returned is adjusted according to the {@link Locale}.
      *
      * @param assetsDir The directory where all the asset files are stored
      * @param type      The type of speech recognition, must be one of {@link SpeechRecognitionTypesEnum}
@@ -58,7 +58,7 @@ public class SpeechRecognitionUtil {
 
     /**
      * Provides the correct acoustic model for {@link com.egd.userinterface.controllers.SpeechToTextController}.
-     * The {@link File} resource returned is adjust to the {@link Locale}.
+     * The {@link File} resource returned is adjusted according to the {@link Locale}.
      *
      * @param assetsDir The directory where all the asset files are stored
      * @param locale    The current {@link Locale} of the system
@@ -77,7 +77,7 @@ public class SpeechRecognitionUtil {
 
     /**
      * Provides the correct dictionary for {@link com.egd.userinterface.controllers.SpeechToTextController}.
-     * The {@link File} resource returned is adjust to the {@link Locale}.
+     * The {@link File} resource returned is adjusted according to the {@link Locale}.
      *
      * @param assetsDir The directory where all the asset files are stored
      * @param locale    The current {@link Locale} of the system
@@ -98,6 +98,8 @@ public class SpeechRecognitionUtil {
      * Generates a map where the key is the translation of the given {@link SpeechRecognitionTypesEnum}
      * type and the value is the {@link SpeechRecognitionTypesEnum} type itself. This functionality is useful
      * for additional language options.
+     * Note, the assumption is made that the correct translation will be used based
+     * on the {@link Locale} of the system!
      *
      * @param context {@link Context} reference
      * @return A map where the key is the translation of the {@link SpeechRecognitionTypesEnum} type, and the value is the {@link SpeechRecognitionTypesEnum} type itself

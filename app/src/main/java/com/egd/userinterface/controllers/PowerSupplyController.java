@@ -11,7 +11,7 @@ import java.io.IOException;
 
 /**
  * A class used to manage a GPIO pin as a power supply. Internally
- * used {@link Gpio} to realize the functionality.
+ * it uses {@link Gpio} to realize the functionality.
  *
  * @author Petar Krastev
  * @since 24.11.2017

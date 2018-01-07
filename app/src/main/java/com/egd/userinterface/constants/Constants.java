@@ -14,7 +14,7 @@ import java.util.Locale;
 public class Constants {
 
     // --------------------------------------------------------------
-    // TEXT TO SPEECH region
+    // region TEXT TO SPEECH
     // --------------------------------------------------------------
 
     /**
@@ -33,11 +33,11 @@ public class Constants {
     public static final float TEXT_TO_SPEECH_DEFAULT_SPEECH_RATE = 1f;
 
     // --------------------------------------------------------------
-    // End of TEXT TO SPEECH region
+    // endregion TEXT TO SPEECH
     // --------------------------------------------------------------
 
     // --------------------------------------------------------------
-    // LED region
+    // region LED
     // --------------------------------------------------------------
 
     /**
@@ -53,11 +53,11 @@ public class Constants {
     public static final String LED_GPIO_OUTPUT = GPIOPortsRaspberryPiEnum.GPIO_PIN7;
 
     // --------------------------------------------------------------
-    // End of LED region
+    // endregion LED
     // --------------------------------------------------------------
 
     // --------------------------------------------------------------
-    // MOTOR region
+    // region MOTOR
     // --------------------------------------------------------------
 
     /**
@@ -74,22 +74,23 @@ public class Constants {
 
     /**
      * Specifies the transition from high to low voltage, or vice versa,
-     * as a percentage for the {@link com.google.android.things.pio.Pwm}.
+     * as a percentage of the {@link com.google.android.things.pio.Pwm}
+     * for the {@link com.egd.userinterface.controllers.MotorController}.
      */
     public static final double MOTOR_PWM_DUTY_CYCLE = 50;
 
     /**
      * Specifies the frequency of the {@link com.google.android.things.pio.Pwm} for the
-     * motor.
+     * {@link com.egd.userinterface.controllers.MotorController}.
      */
     public static final double MOTOR_PWM_FREQUENCY = 0.5;
 
     // --------------------------------------------------------------
-    // End of MOTOR region
+    // endregion MOTOR
     // --------------------------------------------------------------
 
     // --------------------------------------------------------------
-    // SPEECH TO TEXT region
+    // region SPEECH TO TEXT
     // --------------------------------------------------------------
 
     /**
@@ -100,30 +101,30 @@ public class Constants {
 
     /**
      * Specifies the timeout for the speech recognition. After the specified time,
-     * the speech recognition will not working.
+     * the speech recognition will stop.
      */
     public static final int SPEECH_TO_TEXT_TIMEOUT = 10_000;
 
     // --------------------------------------------------------------
-    // End of SPEECH TO TEXT region
+    // endregion SPEECH TO TEXT
     // --------------------------------------------------------------
 
     // --------------------------------------------------------------
-    // POWER SUPPLY region
+    // region POWER SUPPLY
     // --------------------------------------------------------------
 
     /**
      * Specifies the GPIO that will be used as output and power supply for the
-     * buttons.
+     * buttons, used by {@link com.egd.userinterface.controllers.PowerSupplyController}.
      */
     public static final String POWER_SUPPLY_BUTTONS = GPIOPortsRaspberryPiEnum.GPIO_PIN40;
 
     // --------------------------------------------------------------
-    // End of POWER SUPPLY region
+    // endregion POWER SUPPLY
     // --------------------------------------------------------------
 
     // --------------------------------------------------------------
-    // MENU region
+    // region MENU
     // --------------------------------------------------------------
 
     /**
@@ -137,11 +138,11 @@ public class Constants {
     public static final String MENU_INPUT_BUTTON_8 = GPIOPortsRaspberryPiEnum.GPIO_PIN37;
 
     // --------------------------------------------------------------
-    // End of MENU region
+    // endregion MENU
     // --------------------------------------------------------------
 
     // --------------------------------------------------------------
-    // GPIO region
+    // region GPIO
     // --------------------------------------------------------------
 
     /**
@@ -152,6 +153,6 @@ public class Constants {
     public static final int GPIO_CALLBACK_SAMPLE_TIME_MS = 1000;
 
     // --------------------------------------------------------------
-    // End of GPIO region
+    // endregion GPIO
     // --------------------------------------------------------------
 }

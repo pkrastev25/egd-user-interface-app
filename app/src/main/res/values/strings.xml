@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">UserInterface</string>
 
-    <!-- SPEECH RECOGNITION region -->
+    <!-- region TEXT TO SPEECH -->
+
+    <string name="text_to_speech_initialization_of_module">The text to speech module is initialized!</string>
+
+    <!-- endregion TEXT TO SPEECH -->
+
+    <!-- region SPEECH RECOGNITION -->
 
     <!-- Represents the words stored inside all-keywords.list inside the assets folder -->
     <string name="speech_recognition_keyword_find">find</string>
@@ -9,16 +15,16 @@
     <string name="speech_recognition_keyword_test">test</string>
 
     <!-- Generic feedback from the speech recognition -->
+    <string name="speech_recognition_feedback_initialization_of_module">The speech recognition module is initialized!</string>
     <string name="speech_recognition_feedback_no_result">I understood nothing. Try again!</string>
-    <string name="speech_recognition_feedback_module_init_success">The speech recognition has successfully started.</string>
-    <string name="speech_recognition_feedback_module_init_error">An error occurred while starting the speech recognition module.</string>
-    <string name="speech_recognition_feedback_error">An error has occurred while recognizing the speech.</string>
+    <string name="speech_recognition_feedback_start_of_module">How can I help you?</string>
+    <string name="speech_recognition_feedback_recognized_keyword">Yes?</string>
 
-    <!-- End of SPEECH RECOGNITION region -->
+    <!-- endregion SPEECH RECOGNITION region -->
 
-    <!-- TEXT TO SPEECH region -->
+    <!-- region ERROR HANDLING -->
 
-    <string name="text_to_speech_module_init_success">The text to speech module has successfully started.</string>
+    <string name="error_handling_occurred_error">An internal error has occurred!</string>
 
-    <!-- End of TEXT TO SPEECH region -->
+    <!-- endregion ERROR HANDLING -->
 </resources>

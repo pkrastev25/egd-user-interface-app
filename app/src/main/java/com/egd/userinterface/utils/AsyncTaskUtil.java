@@ -10,7 +10,6 @@ import android.util.Log;
  * Provides an interface for usage which helps identify the result of the asynchronous operation.
  *
  * @author Petar Krastev
- * @version 1.0
  * @since 5.11.2017
  */
 public class AsyncTaskUtil extends AsyncTask<Void, Void, Object> {
@@ -24,7 +23,7 @@ public class AsyncTaskUtil extends AsyncTask<Void, Void, Object> {
     private Exception mException;
 
     /**
-     * Create an instance of {@link AsyncTaskUtil}. An explicit call to {@link #execute(Object[])}
+     * Creates an instance of {@link AsyncTaskUtil}. An explicit call to {@link #execute(Object[])}
      * is needed to start the asynchronous task.
      *
      * @param listener Instance of {@link IAsyncTaskListener}
@@ -34,7 +33,7 @@ public class AsyncTaskUtil extends AsyncTask<Void, Void, Object> {
     }
 
     /**
-     * Create an instance of {@link AsyncTaskUtil}. The task is automatically started.
+     * Creates an instance of {@link AsyncTaskUtil}. The task is automatically started.
      *
      * @param listener Instance of {@link IAsyncTaskListener}
      */
@@ -64,7 +63,7 @@ public class AsyncTaskUtil extends AsyncTask<Void, Void, Object> {
     }
 
     /**
-     * Called right after {@link #execute(Object[])} is started. Performs the request and
+     * Called right after {@link #execute(Object[])} is started. Performs the task and
      * catches any errors during execution.
      *
      * @param params Ignored, {@link IAsyncTaskListener#onExecuteTask()} takes care of invoking the request
@@ -76,8 +75,8 @@ public class AsyncTaskUtil extends AsyncTask<Void, Void, Object> {
         try {
             return mListener.onExecuteTask();
         } catch (Exception e) {
-            mException = e;
             Log.e(TAG, "AsyncTaskUtil.doInBackground() failed!", e);
+            mException = e;
         }
 
         return null;

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.egd.userinterface.R;
 import com.egd.userinterface.constants.Constants;
+import com.egd.userinterface.controllers.models.IMotorController;
 import com.egd.userinterface.controllers.models.ITextToSpeechController;
 
 import java.util.LinkedList;
@@ -46,6 +47,12 @@ public class TextToSpeechController implements ITextToSpeechController {
     private TextToSpeech mTextToSpeech;
 
     /**
+     * Used to give the user haptic feedback if the {@link TextToSpeechController}
+     * fails to initialize.
+     */
+    private IMotorController mMotorController;
+
+    /**
      * Initializes the {@link TextToSpeech}. Upon successful initialization, it
      * executes all pending {@link TextToSpeechController#speak(String)} operations,
      * if there are any.
@@ -57,8 +64,16 @@ public class TextToSpeechController implements ITextToSpeechController {
      */
     private TextToSpeechController(Context context, final Locale language, final float pitch, final float speechRate) {
         mPendingOperations = new LinkedList<>();
+        // Give the user feedback if the module is successfully started
         mPendingOperations.add(
-                context.getString(R.string.text_to_speech_module_init_success)
+                context.getString(R.string.text_to_speech_initialization_of_module)
+        );
+
+        mMotorController = new MotorController(
+                Constants.MOTOR_GPIO_INPUT,
+                Constants.MOTOR_GPIO_OUTPUT,
+                Constants.MOTOR_PWM_DUTY_CYCLE,
+                Constants.MOTOR_PWM_FREQUENCY
         );
 
         mTextToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
@@ -72,8 +87,8 @@ public class TextToSpeechController implements ITextToSpeechController {
                     executePendingOperations();
                 } else {
                     Log.e(TAG, "TextToSpeech.OnInitListener() failed!");
-                    mTextToSpeech = null;
-                    MotorController.getInstance().start();
+                    // Give the user feedback that the module failed to initialize
+                    mMotorController.start();
                 }
             }
         });
@@ -126,17 +141,21 @@ public class TextToSpeechController implements ITextToSpeechController {
      */
     @Override
     public void speak(String output) {
-        synchronized (TextToSpeechController.class) {
-            if (mIsInitialized) {
-                int result = mTextToSpeech.speak(output, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID);
+        if (mIsInitialized) {
+            synchronized (TextToSpeechController.class) {
+                if (mIsInitialized) {
+                    int result = mTextToSpeech.speak(output, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID);
 
-                if (result == TextToSpeech.ERROR) {
-                    Log.e(TAG, "TextToSpeech.speak() failed!");
-                    MotorController.getInstance().start();
+                    if (result == TextToSpeech.ERROR) {
+                        Log.e(TAG, "TextToSpeech.speak() failed!");
+                        mMotorController.start();
+                    }
+                } else {
+                    mPendingOperations.add(output);
                 }
-            } else {
-                mPendingOperations.add(output);
             }
+        } else {
+            mPendingOperations.add(output);
         }
     }
 
@@ -152,6 +171,11 @@ public class TextToSpeechController implements ITextToSpeechController {
                     if (mTextToSpeech != null) {
                         mTextToSpeech.shutdown();
                         mTextToSpeech = null;
+                    }
+
+                    if (mMotorController != null) {
+                        mMotorController.clean();
+                        mMotorController = null;
                     }
 
                     mPendingOperations = null;

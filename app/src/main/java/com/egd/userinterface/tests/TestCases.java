@@ -3,11 +3,11 @@ package com.egd.userinterface.tests;
 import android.os.Handler;
 
 import com.egd.userinterface.constants.Constants;
-import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnum;
 import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MotorController;
-import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
+import com.egd.userinterface.controllers.models.ILEDController;
+import com.egd.userinterface.controllers.models.IMotorController;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,10 +29,10 @@ public class TestCases {
 
     /**
      * Simple test case for the {@link LEDController}. Turns on the LEDs and
-     * turns them off after 30 seconds.
+     * turns them off after 1 minute.
      */
     public static void LEDControllerTest() {
-        final LEDController controller = new LEDController(
+        final ILEDController controller = new LEDController(
                 Constants.LED_GPIO_INPUT,
                 Constants.LED_GPIO_OUTPUT
         );
@@ -49,27 +49,22 @@ public class TestCases {
 
     /**
      * Simple test case for the {@link MotorController}. Starts the motor
-     * and stops it after 1 second.
+     * and stops it after 1 minute.
      */
     public static void MotorControllerTest() {
-        MotorController.getInstance().start();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                MotorController.getInstance().stop();
-            }
-        }, TimeUnit.MINUTES.toMillis(1));
-    }
+        final IMotorController controller = new MotorController(
+                Constants.MOTOR_GPIO_INPUT,
+                Constants.MOTOR_GPIO_OUTPUT,
+                Constants.MOTOR_PWM_DUTY_CYCLE,
+                Constants.MOTOR_PWM_FREQUENCY
+        );
 
-    /**
-     * Simple test case for the {@link SpeechToTextController}. Triggers a speech
-     * recognition and forwards the result to the {@link TextToSpeechController}.
-     */
-    public static void SpeechToTextControllerTest() {
+        controller.start();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                SpeechToTextController.getInstance().recognizeSpeech(SpeechRecognitionTypesEnum.ALL_KEYWORDS);
+                controller.stop();
+                controller.clean();
             }
         }, TimeUnit.MINUTES.toMillis(1));
     }

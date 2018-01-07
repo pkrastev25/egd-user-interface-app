@@ -7,7 +7,6 @@ import com.egd.userinterface.R;
 import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.controllers.LEDController;
 import com.egd.userinterface.controllers.MenuController;
-import com.egd.userinterface.controllers.MotorController;
 import com.egd.userinterface.controllers.PowerSupplyController;
 import com.egd.userinterface.controllers.SpeechToTextController;
 import com.egd.userinterface.controllers.TextToSpeechController;
@@ -28,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Init just in case the activity got destroyed
+        TextToSpeechController.init(this);
+        SpeechToTextController.init(this);
+
         mLEDController = new LEDController(
                 Constants.LED_GPIO_INPUT,
                 Constants.LED_GPIO_OUTPUT
@@ -41,11 +44,6 @@ public class MainActivity extends AppCompatActivity {
                 Constants.MENU_INPUT_BUTTON_5,
                 Constants.MENU_INPUT_BUTTON_8
         );
-
-        // Init just in case the activity got destroyed
-        MotorController.init();
-        TextToSpeechController.init(this);
-        SpeechToTextController.init(this);
     }
 
     @Override
@@ -65,11 +63,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        MotorController.getInstance().clean();
         TextToSpeechController.getInstance().clean();
         SpeechToTextController.getInstance().clean();
         mLEDController.clean();
+        mLEDController = null;
         mPowerSupplyController.clean();
+        mPowerSupplyController = null;
         mMenuController.clean();
+        mMenuController = null;
     }
 }

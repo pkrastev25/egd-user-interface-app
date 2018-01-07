@@ -23,7 +23,7 @@ public class GPIOUtil {
      * Configures a GPIO as an input according to the specifications.
      *
      * @param pinName          Name of the GPIO port, must be one of type {@link GPIOPortsRaspberryPiEnum}
-     * @param isHighActiveType If true, the active type of the GPIO will be set to {@link Gpio#ACTIVE_HIGH}, false otherwise, {@link Gpio#ACTIVE_LOW}
+     * @param isHighActiveType If true, the active type of the GPIO will be set to {@link Gpio#ACTIVE_HIGH}, false otherwise - {@link Gpio#ACTIVE_LOW}
      * @return Configured {@link Gpio}
      * @throws IOException If the configuration of the {@link Gpio} fails
      */
@@ -42,8 +42,8 @@ public class GPIOUtil {
      * Configures a GPIO as an output according to the specifications.
      *
      * @param pinName          Name of the GPIO port, must be one of type {@link GPIOPortsRaspberryPiEnum}
-     * @param isInitiallyHigh  If true, the GPIO will have an initial value of high, {@link Gpio#DIRECTION_OUT_INITIALLY_HIGH}, false otherwise, {@link Gpio#DIRECTION_OUT_INITIALLY_LOW}
-     * @param isHighActiveType If true, the active type of the GPIO will be set to {@link Gpio#ACTIVE_HIGH}, false otherwise, {@link Gpio#ACTIVE_LOW}
+     * @param isInitiallyHigh  If true, the GPIO will have an initial value of high, {@link Gpio#DIRECTION_OUT_INITIALLY_HIGH}, false otherwise - {@link Gpio#DIRECTION_OUT_INITIALLY_LOW}
+     * @param isHighActiveType If true, the active type of the GPIO will be set to {@link Gpio#ACTIVE_HIGH}, false otherwise - {@link Gpio#ACTIVE_LOW}
      * @return Configured {@link Gpio}
      * @throws IOException If the configuration of the {@link Gpio} fails
      */
