@@ -70,6 +70,7 @@ public class TextToSpeechController implements ITextToSpeechController {
         );
 
         mMotorController = new MotorController(
+                context,
                 Constants.MOTOR_GPIO_INPUT,
                 Constants.MOTOR_GPIO_OUTPUT,
                 Constants.MOTOR_PWM_DUTY_CYCLE,

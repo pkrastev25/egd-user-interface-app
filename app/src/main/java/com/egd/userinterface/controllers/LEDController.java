@@ -1,8 +1,10 @@
 package com.egd.userinterface.controllers;
 
+import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import com.egd.userinterface.R;
 import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.constants.enums.GPIOEdgeTriggerTypesEnum;
 import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPiEnum;
@@ -27,6 +29,8 @@ public class LEDController implements ILEDController {
      */
     private static final String TAG = LEDController.class.getSimpleName();
 
+    private Context mContext;
+
     // INPUT/OUTPUT helpers
     private Gpio mInput;
     private Gpio mOutput;
@@ -42,10 +46,11 @@ public class LEDController implements ILEDController {
      * interrupts for {@link Constants#GPIO_CALLBACK_SAMPLE_TIME_MS} after successfully
      * detecting the 1st interrupt. Greatly improves performance!
      *
-     * @param input The {@link Gpio} that will be configured as input
+     * @param input  The {@link Gpio} that will be configured as input
      * @param output The {@link Gpio} that will be configured as output
      */
-    public LEDController(@GPIOPortsRaspberryPiEnum String input, @GPIOPortsRaspberryPiEnum String output) {
+    public LEDController(Context context, @GPIOPortsRaspberryPiEnum String input, @GPIOPortsRaspberryPiEnum String output) {
+        mContext = context;
         mShouldDetectEdge = true;
         mInputCallback = new GpioCallback() {
             @Override
@@ -109,6 +114,9 @@ public class LEDController implements ILEDController {
 
         try {
             mOutput.setValue(true);
+            TextToSpeechController.getInstance().speak(
+                    mContext.getString(R.string.led_feedback_on)
+            );
         } catch (IOException e) {
             Log.e(TAG, "LEDController.LEDsOn() failed!", e);
         }
@@ -124,6 +132,9 @@ public class LEDController implements ILEDController {
 
         try {
             mOutput.setValue(false);
+            TextToSpeechController.getInstance().speak(
+                    mContext.getString(R.string.led_feedback_off)
+            );
         } catch (IOException e) {
             Log.e(TAG, "LEDController.LEDsOff() failed!", e);
         }
@@ -151,5 +162,6 @@ public class LEDController implements ILEDController {
         mInput = null;
         mInputCallback = null;
         mOutput = null;
+        mContext = null;
     }
 }

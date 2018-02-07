@@ -22,6 +22,20 @@
 
     <!-- endregion SPEECH RECOGNITION region -->
 
+    <!-- region LED -->
+
+    <string name="led_feedback_on">LEDs are ON!</string>
+    <string name="led_feedback_off">LEDs are OFF!</string>
+
+    <!-- endregion LED -->
+
+    <!-- region MOTOR -->
+
+    <string name="motor_feedback_on">Motor is ON!</string>
+    <string name="motor_feedback_off">Motor is OFF!</string>
+
+    <!-- endregion MOTOR -->
+
     <!-- region ERROR HANDLING -->
 
     <string name="error_handling_occurred_error">An internal error has occurred!</string>

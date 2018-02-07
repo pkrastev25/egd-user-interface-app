@@ -1,8 +1,10 @@
 package com.egd.userinterface.controllers;
 
+import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import com.egd.userinterface.R;
 import com.egd.userinterface.constants.Constants;
 import com.egd.userinterface.constants.enums.GPIOEdgeTriggerTypesEnum;
 import com.egd.userinterface.constants.enums.GPIOPWMRaspberryPiEnum;
@@ -29,6 +31,8 @@ public class MotorController implements IMotorController {
      */
     private static final String TAG = MotorController.class.getSimpleName();
 
+    private Context mContext;
+
     // INPUT/OUTPUT helpers
     private Gpio mInput;
     private Pwm mPWMOutput;
@@ -50,11 +54,13 @@ public class MotorController implements IMotorController {
      * @param frequency Specifies the frequency of the {@link Pwm} output
      */
     public MotorController(
+            Context context,
             @GPIOPortsRaspberryPiEnum String input,
             @GPIOPWMRaspberryPiEnum String output,
             double dutyCycle,
             double frequency
     ) {
+        mContext = context;
         mShouldDetectEdge = true;
         mInputCallback = new GpioCallback() {
             @Override
@@ -118,6 +124,9 @@ public class MotorController implements IMotorController {
 
             try {
                 mPWMOutput.setEnabled(true);
+                TextToSpeechController.getInstance().speak(
+                        mContext.getString(R.string.motor_feedback_on)
+                );
             } catch (IOException e) {
                 Log.e(TAG, "MotorController.start() failed!", e);
             }
@@ -134,6 +143,9 @@ public class MotorController implements IMotorController {
 
             try {
                 mPWMOutput.setEnabled(false);
+                TextToSpeechController.getInstance().speak(
+                        mContext.getString(R.string.motor_feedback_off)
+                );
             } catch (IOException e) {
                 Log.e(TAG, "MotorController.stop() failed!", e);
             }
@@ -162,5 +174,6 @@ public class MotorController implements IMotorController {
         mInputCallback = null;
         mInput = null;
         mPWMOutput = null;
+        mContext = null;
     }
 }

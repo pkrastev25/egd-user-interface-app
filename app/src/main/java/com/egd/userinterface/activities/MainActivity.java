@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         SpeechToTextController.init(this);
 
         mLEDController = new LEDController(
+                this,
                 Constants.LED_GPIO_INPUT,
                 Constants.LED_GPIO_OUTPUT
         );
@@ -53,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
         /*
          * Test cases below. Uncomment if a certain module must be tested!
          */
-        //TestCases.LEDControllerTest();
-        //TestCases.MotorControllerTest();
+        //TestCases.LEDControllerTest(this);
+        //TestCases.MotorControllerTest(this);
         //TestCases.TextToSpeechControllerTest();
         //TestCases.SpeechToTextControllerTest();
     }

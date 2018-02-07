@@ -1,5 +1,6 @@
 package com.egd.userinterface.tests;
 
+import android.content.Context;
 import android.os.Handler;
 
 import com.egd.userinterface.constants.Constants;
@@ -31,8 +32,9 @@ public class TestCases {
      * Simple test case for the {@link LEDController}. Turns on the LEDs and
      * turns them off after 1 minute.
      */
-    public static void LEDControllerTest() {
+    public static void LEDControllerTest(Context context) {
         final ILEDController controller = new LEDController(
+                context,
                 Constants.LED_GPIO_INPUT,
                 Constants.LED_GPIO_OUTPUT
         );
@@ -51,8 +53,9 @@ public class TestCases {
      * Simple test case for the {@link MotorController}. Starts the motor
      * and stops it after 1 minute.
      */
-    public static void MotorControllerTest() {
+    public static void MotorControllerTest(Context context) {
         final IMotorController controller = new MotorController(
+                context,
                 Constants.MOTOR_GPIO_INPUT,
                 Constants.MOTOR_GPIO_OUTPUT,
                 Constants.MOTOR_PWM_DUTY_CYCLE,

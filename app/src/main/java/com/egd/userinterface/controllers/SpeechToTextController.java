@@ -72,6 +72,7 @@ public class SpeechToTextController implements ISpeechToTextController {
      */
     private SpeechToTextController(final Context context) {
         mContext = context;
+        mShouldDetectEdge = true;
         mKeywordContainer = SpeechRecognitionUtil.mapWordsToSpeechRecognitionTypes(context);
 
         mInputCallback = new GpioCallback() {

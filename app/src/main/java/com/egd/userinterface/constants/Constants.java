@@ -97,7 +97,7 @@ public class Constants {
      * Specifies the GPIO pin that will serve as input for the
      * {@link com.egd.userinterface.controllers.SpeechToTextController}.
      */
-    public static final String SPEECH_TO_TEXT_INPUT = GPIOPortsRaspberryPiEnum.GPIO_PIN23;
+    public static final String SPEECH_TO_TEXT_INPUT = GPIOPortsRaspberryPiEnum.GPIO_PIN37;
 
     /**
      * Specifies the timeout for the speech recognition. After the specified time,
@@ -135,7 +135,7 @@ public class Constants {
     /**
      * TODO: Dummy just for testing, replace when the menu is actually implemented
      */
-    public static final String MENU_INPUT_BUTTON_8 = GPIOPortsRaspberryPiEnum.GPIO_PIN37;
+    public static final String MENU_INPUT_BUTTON_8 = GPIOPortsRaspberryPiEnum.GPIO_PIN23;
 
     // --------------------------------------------------------------
     // endregion MENU
