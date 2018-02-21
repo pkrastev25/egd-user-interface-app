@@ -1,4 +1,4 @@
-package com.egd.userinterface.controllers.models;
+package com.egd.userinterface.controllers.models
 
 /**
  * Base abstraction for all controllers. Place methods here that every
@@ -7,10 +7,10 @@ package com.egd.userinterface.controllers.models;
  * @author Petar Krastev
  * @since 12.11.2017
  */
-public interface IController {
+interface IController {
 
     /**
      * Releases all resources held by the controller class.
      */
-    void clean();
+    fun clean()
 }

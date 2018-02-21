@@ -1,4 +1,4 @@
-package com.egd.userinterface.controllers.models;
+package com.egd.userinterface.controllers.models
 
 /**
  * Abstraction for the controller responsible for managing the LEDs.
@@ -6,15 +6,15 @@ package com.egd.userinterface.controllers.models;
  * @author Petar Krastev
  * @since 12.11.2017
  */
-public interface ILEDController extends IController {
+interface ILEDController : IController {
 
     /**
      * Turns on the LEDs.
      */
-    void LEDsON();
+    fun LEDsON()
 
     /**
      * Turns off the LEDs.
      */
-    void LEDsOFF();
+    fun LEDsOFF()
 }
