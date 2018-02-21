@@ -1,4 +1,4 @@
-package com.egd.userinterface.controllers.models;
+package com.egd.userinterface.controllers.models
 
 /**
  * Abstraction for the controller responsible for managing the motor.
@@ -6,15 +6,15 @@ package com.egd.userinterface.controllers.models;
  * @author Petar Krastev
  * @since 12.11.2017
  */
-public interface IMotorController extends IController {
+interface IMotorController : IController {
 
     /**
      * Starts the motor.
      */
-    void start();
+    fun start()
 
     /**
      * Stops the motor.
      */
-    void stop();
+    fun stop()
 }
