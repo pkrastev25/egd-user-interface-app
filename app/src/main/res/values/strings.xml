@@ -41,4 +41,12 @@
     <string name="error_handling_occurred_error">An internal error has occurred!</string>
 
     <!-- endregion ERROR HANDLING -->
+
+    <string name="view_initialization_message">The application is initializing. Please wait…</string>
+    <string name="view_initialization_error_message">The application components could not initialize. Please, restart the app!</string>
+
+    <string name="menu_back_button">Back</string>
+    <string name="menu_previous_button">Previous</string>
+    <string name="menu_next_button">Next</string>
+    <string name="menu_confirm_button">Confirm</string>
 </resources>

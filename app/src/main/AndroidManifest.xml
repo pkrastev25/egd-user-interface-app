@@ -5,8 +5,8 @@
     >
 
     <!-- Permissions for speech to text -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
         android:allowBackup="true"
@@ -18,9 +18,11 @@
         >
 
         <!-- Enable Android Things -->
-        <uses-library android:name="com.google.android.things"/>
+        <uses-library
+            android:name="com.google.android.things"
+            android:required="false"/>
 
-        <activity android:name=".activities.MainActivity">
+        <activity android:name="com.egd.userinterface.ui.activities.MainActivity">
             <!-- Launch activity as default from Android Studio -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
