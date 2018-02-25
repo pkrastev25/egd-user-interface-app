@@ -42,6 +42,7 @@
 
     <!-- endregion ERROR HANDLING -->
 
+    <string name="view_permissions_warning_message">This application requires certain permissions to function. Please, grant them!</string>
     <string name="view_initialization_message">The application is initializing. Please wait…</string>
     <string name="view_initialization_error_message">The application components could not initialize. Please, restart the app!</string>
 
@@ -49,4 +50,7 @@
     <string name="menu_previous_button">Previous</string>
     <string name="menu_next_button">Next</string>
     <string name="menu_confirm_button">Confirm</string>
+
+    <string name="button_request_permissions">Request permissions</string>
+    <string name="button_close_application">Close application</string>
 </resources>

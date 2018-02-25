@@ -9,6 +9,7 @@ import com.egd.userinterface.constants.Constants
 import com.egd.userinterface.constants.enums.InputGPIOEdgeTriggerTypesEnum
 import com.egd.userinterface.constants.enums.GPIOPortsRaspberryPiEnumAnnotation
 import com.egd.userinterface.controllers.models.ILEDController
+import com.egd.userinterface.services.TextToSpeechService
 import com.egd.userinterface.utils.GPIOUtil
 import com.google.android.things.pio.Gpio
 import com.google.android.things.pio.GpioCallback
@@ -100,9 +101,11 @@ class LEDController
 
         try {
             mOutput!!.value = true
-            TextToSpeechController.instance.speak(
+            /*
+            TextToSpeechService.instance.convertTextToSpeech(
                     mContext!!.getString(R.string.led_feedback_on)
             )
+            */
         } catch (e: IOException) {
             Log.e(TAG, "LEDController.LEDsOn() failed!", e)
         }
@@ -118,9 +121,11 @@ class LEDController
 
         try {
             mOutput!!.value = false
-            TextToSpeechController.instance.speak(
+            /*
+            TextToSpeechService.instance.convertTextToSpeech(
                     mContext!!.getString(R.string.led_feedback_off)
             )
+            */
         } catch (e: IOException) {
             Log.e(TAG, "LEDController.LEDsOff() failed!", e)
         }

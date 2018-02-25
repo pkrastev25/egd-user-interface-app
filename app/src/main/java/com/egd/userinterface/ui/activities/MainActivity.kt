@@ -1,76 +1,56 @@
 package com.egd.userinterface.ui.activities
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import android.support.v4.app.ActivityCompat
 import com.egd.userinterface.R
-import com.egd.userinterface.ui.presenters.MainPresenter
-import com.egd.userinterface.ui.views.IMainActivity
-import com.egd.userinterface.view.states.MenuViewState
-import com.hannesdorfmann.mosby3.mvi.MviActivity
-import com.jakewharton.rxbinding2.view.clicks
-import io.reactivex.Observable
-import kotlinx.android.synthetic.main.view_initialization.*
-import kotlinx.android.synthetic.main.view_initialization_error.*
-import kotlinx.android.synthetic.main.view_menu.*
+import com.egd.userinterface.utils.PermissionsUtil
+import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : MviActivity<IMainActivity, MainPresenter>(), IMainActivity {
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-    }
 
-    override fun createPresenter(): MainPresenter {
-        return MainPresenter()
-    }
+        if (!PermissionsUtil.areRecordAudioPermissionsGranted(this)) {
+            requestPermissions()
+        } else {
+            startActivity(Intent(this, MenuActivity::class.java))
+        }
 
-    override fun render(state: MenuViewState) {
-        when (state) {
-            is MenuViewState.InitializationState -> renderInitializationState()
-            is MenuViewState.CurrentMenuState -> renderCurrentMenuState(state)
-            is MenuViewState.ErrorState -> renderErrorState()
-            MenuViewState.InitializationErrorState -> renderInitializationErrorState()
+        request_permissions_button.setOnClickListener {
+            requestPermissions()
+        }
+        close_application_button.setOnClickListener {
+            finish()
         }
     }
 
-    override fun onPreviousMenuButtonIntent(): Observable<Unit> {
-        return previous_menu_button.clicks()
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            MainActivity.PERMISSIONS_RECORD_AUDIO_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(Intent(this, MenuActivity::class.java))
+                }
+            }
+        }
     }
 
-    override fun onNextMenuButtonIntent(): Observable<Unit> {
-        return next_menu_button.clicks()
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                MainActivity.PERMISSIONS_RECORD_AUDIO_REQUEST_CODE
+        )
     }
 
-    override fun onConfirmMenuButtonIntent(): Observable<Unit> {
-        return confirm_menu_button.clicks()
-    }
-
-    override fun onBackMenuButtonIntent(): Observable<Unit> {
-        return back_menu_button.clicks()
-    }
-
-    private fun renderInitializationState() {
-        initialization_view.visibility = View.VISIBLE
-        initialization_error_view.visibility = View.GONE
-        menu_view.visibility = View.GONE
-    }
-
-    private fun renderInitializationErrorState() {
-        initialization_view.visibility = View.GONE
-        initialization_error_view.visibility = View.VISIBLE
-        menu_view.visibility = View.GONE
-    }
-
-    private fun renderCurrentMenuState(state: MenuViewState.CurrentMenuState) {
-        initialization_view.visibility = View.GONE
-        initialization_error_view.visibility = View.GONE
-        menu_view.visibility = View.VISIBLE
-        current_menu_state_view.text = state.currentMenuState
-    }
-
-    private fun renderErrorState() {
-        initialization_view.visibility = View.GONE
-        initialization_error_view.visibility = View.GONE
-        menu_view.visibility = View.VISIBLE
+    companion object {
+        private const val PERMISSIONS_RECORD_AUDIO_REQUEST_CODE = 0
     }
 }

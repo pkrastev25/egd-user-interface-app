@@ -8,6 +8,7 @@ import com.egd.userinterface.R
 import com.egd.userinterface.constants.Constants
 import com.egd.userinterface.constants.enums.*
 import com.egd.userinterface.controllers.models.IMotorController
+import com.egd.userinterface.services.TextToSpeechService
 import com.egd.userinterface.utils.GPIOUtil
 import com.google.android.things.pio.Gpio
 import com.google.android.things.pio.GpioCallback
@@ -108,9 +109,11 @@ class MotorController
 
             try {
                 mPWMOutput!!.setEnabled(true)
-                TextToSpeechController.instance.speak(
+                /*
+                TextToSpeechService.instance.convertTextToSpeech(
                         mContext!!.getString(R.string.motor_feedback_on)
                 )
+                */
             } catch (e: IOException) {
                 Log.e(TAG, "MotorController.start() failed!", e)
             }
@@ -127,9 +130,11 @@ class MotorController
 
             try {
                 mPWMOutput!!.setEnabled(false)
-                TextToSpeechController.instance.speak(
+                /*
+                TextToSpeechService.instance.convertTextToSpeech(
                         mContext!!.getString(R.string.motor_feedback_off)
                 )
+                */
             } catch (e: IOException) {
                 Log.e(TAG, "MotorController.stop() failed!", e)
             }
