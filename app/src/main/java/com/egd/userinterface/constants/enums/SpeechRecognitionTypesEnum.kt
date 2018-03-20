@@ -1,7 +1,5 @@
 package com.egd.userinterface.constants.enums
 
-import android.support.annotation.StringDef
-
 /**
  * Specifies all the speech recognition capabilities of the
  * [com.egd.userinterface.controllers.SpeechToTextController].
@@ -9,15 +7,6 @@ import android.support.annotation.StringDef
  * @author Petar Krastev
  * @since 23.11.2017
  */
-@Retention(AnnotationRetention.SOURCE)
-@StringDef(
-        SpeechRecognitionTypesEnum.ALL_KEYWORDS,
-        SpeechRecognitionTypesEnum.FIND_KEYWORD,
-        SpeechRecognitionTypesEnum.NAVIGATE_KEYWORD,
-        SpeechRecognitionTypesEnum.TEST_KEYWORD
-)
-annotation class SpeechRecognitionTypesEnumAnnotation
-
 object SpeechRecognitionTypesEnum {
 
     /**

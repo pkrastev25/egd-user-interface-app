@@ -1,14 +1,11 @@
 package com.egd.userinterface.utils
 
 import android.content.Context
-
 import com.egd.userinterface.R
+import com.egd.userinterface.constants.annotations.SpeechRecognitionTypesAnnotation
 import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnum
-import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnumAnnotation
-
 import java.io.File
-import java.util.HashMap
-import java.util.Locale
+import java.util.*
 
 /**
  * Helper class used to manage the resources needed by the
@@ -29,7 +26,7 @@ object SpeechRecognitionUtil {
      * @param locale    The current [Locale] of the system
      * @return The [File] resource that must be used for the speech recognition type
      */
-    fun getAssetsForKeyword(assetsDir: File, @SpeechRecognitionTypesEnumAnnotation type: String, locale: Locale): File {
+    fun getAssetsForKeyword(assetsDir: File, @SpeechRecognitionTypesAnnotation type: String, locale: Locale): File {
         when (type) {
             SpeechRecognitionTypesEnum.FIND_KEYWORD -> {
                 if (Locale.US == locale) {

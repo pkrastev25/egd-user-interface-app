@@ -51,6 +51,14 @@
     <string name="menu_next_button">Next</string>
     <string name="menu_confirm_button">Confirm</string>
 
+    <string name="menu_state_speech_recognition_start">Start speech recognition</string>
+    <string name="menu_state_external_led_options">External LED options</string>
+    <string name="menu_state_external_led_options_turn_led_on">Turn LEDs on</string>
+    <string name="menu_state_external_led_options_turn_led_off">Turn LEDs off</string>
+    <string name="menu_state_external_motor_options">External motor options</string>
+    <string name="menu_state_external_motor_options_start_motor">Start motor</string>
+    <string name="menu_state_external_motor_options_stop_motor">Stop motor</string>
+
     <string name="button_request_permissions">Request permissions</string>
     <string name="button_close_application">Close application</string>
 </resources>

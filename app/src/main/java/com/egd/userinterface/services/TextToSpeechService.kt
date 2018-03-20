@@ -3,10 +3,11 @@ package com.egd.userinterface.services
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import com.egd.userinterface.event.bus.EventBus
-import com.egd.userinterface.event.bus.events.TextToSpeechConvertErrorEvent
-import com.egd.userinterface.event.bus.events.TextToSpeechInitializationEvent
-import com.egd.userinterface.services.models.ITextToSpeechService
+import com.egd.userinterface.services.interfaces.ITextToSpeechService
+import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import java.util.*
 
 /**
@@ -23,43 +24,56 @@ class TextToSpeechService(
         speechRate: Float
 ) : ITextToSpeechService {
 
-    private var mIsInitialized: Boolean = false
     private var mTextToSpeech: TextToSpeech? = null
+    private var mIsInit = false
+    private val mInitState = BehaviorSubject.create<Unit>()
 
     init {
-        mTextToSpeech = TextToSpeech(context, TextToSpeech.OnInitListener { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                mTextToSpeech!!.language = language
-                mTextToSpeech!!.setPitch(pitch)
-                mTextToSpeech!!.setSpeechRate(speechRate)
-                mIsInitialized = true
-                EventBus.publish(
-                        TextToSpeechInitializationEvent(true)
-                )
-            } else {
-                Log.e(TAG, "TextToSpeech.OnInitListener() failed!")
-                EventBus.publish(
-                        TextToSpeechInitializationEvent(false)
-                )
-            }
-        })
+        Completable.create {
+            mTextToSpeech = TextToSpeech(context, TextToSpeech.OnInitListener { state ->
+                if (state == TextToSpeech.SUCCESS) {
+                    mTextToSpeech!!.language = language
+                    mTextToSpeech!!.setPitch(pitch)
+                    mTextToSpeech!!.setSpeechRate(speechRate)
+                    it.onComplete()
+                } else {
+                    Log.e(TAG, "TextToSpeech.OnInitListener() failed!")
+                    it.onError(Throwable("ERROR"))
+                }
+            })
+        }.doOnComplete {
+            mIsInit = true
+            mInitState.onNext(Unit)
+        }.doOnError {
+            mInitState.onError(it)
+        }.observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
+                .subscribe()
     }
 
-    override fun convertTextToSpeech(textToBeConverted: String) {
-        if (mIsInitialized) {
+    override fun getInitState(): Observable<Unit> {
+        return mInitState
+    }
+
+    override fun convertTextToSpeech(textToBeConverted: String): Observable<Unit> {
+        return Observable.create {
+            if (!mIsInit) {
+                it.onError(Throwable("ERROR"))
+            }
+
             val result = mTextToSpeech?.speak(textToBeConverted, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID)
 
-            if (result == TextToSpeech.ERROR) {
+            if (result == TextToSpeech.SUCCESS) {
+                it.onComplete()
+            } else {
                 Log.e(TAG, "TextToSpeech.convertTextToSpeech() failed!")
-                EventBus.publish(
-                        TextToSpeechConvertErrorEvent()
-                )
+                it.onError(Throwable("ERROR"))
             }
         }
     }
 
     override fun release() {
         mTextToSpeech?.shutdown()
+        mInitState.onComplete()
     }
 
     companion object {

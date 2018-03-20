@@ -4,16 +4,17 @@ import android.content.Context
 import android.util.Log
 import com.egd.userinterface.R
 import com.egd.userinterface.constants.Constants
+import com.egd.userinterface.constants.annotations.SpeechRecognitionTypesAnnotation
 import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnum
-import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnumAnnotation
-import com.egd.userinterface.event.bus.EventBus
-import com.egd.userinterface.event.bus.events.SpeechToTextInitializationEvent
-import com.egd.userinterface.event.bus.events.TextToSpeechConvertEvent
-import com.egd.userinterface.services.models.ISpeechToTextService
+import com.egd.userinterface.services.interfaces.ISpeechToTextService
+import com.egd.userinterface.services.interfaces.ITextToSpeechService
 import com.egd.userinterface.utils.SpeechRecognitionUtil
 import edu.cmu.pocketsphinx.*
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import java.util.*
 
 /**
@@ -23,11 +24,19 @@ import java.util.*
  * @author Petar Krastev
  * @since 5.11.2017
  */
-class SpeechToTextService(private var mContext: Context?) : ISpeechToTextService {
+class SpeechToTextService(
+        context: Context,
+        textToSpeechService: ITextToSpeechService
+) : ISpeechToTextService {
 
+    private val mContext = context.applicationContext
+    private val mTextToSpeechService = textToSpeechService
     private var mSpeechRecognizer: SpeechRecognizer? = null
-    private var mIsInitialized = false
+    private var mIsInit = false
     private var mIsActive = false
+
+    private val mInitState = BehaviorSubject.create<Unit>()
+    private lateinit var mSpeechRecognitionSubject: PublishSubject<Unit>
 
     /**
      * Map where the key is the translation of the given [SpeechRecognitionTypesEnum]
@@ -36,82 +45,104 @@ class SpeechToTextService(private var mContext: Context?) : ISpeechToTextService
     private val mKeywordContainer = SpeechRecognitionUtil.mapWordsToSpeechRecognitionTypes(this.mContext!!)
 
     init {
-        Observable.just(
-                try {
-                    val assets = Assets(mContext)
-                    val assetDir = assets.syncAssets()
-                    // Adjust the language according to the locale
-                    val locale = Locale.US
-
-                    // Initialize the recognizer, set the acoustic model and the dictionary
-                    val speechRecognizer = SpeechRecognizerSetup.defaultSetup()
-                            .setAcousticModel(
-                                    SpeechRecognitionUtil.getAcousticModel(assetDir, locale)
-                            )
-                            .setDictionary(
-                                    SpeechRecognitionUtil.getDictionary(assetDir, locale)
-                            )
-                            .recognizer
-
-                    // Include a search option for the keywords
-                    speechRecognizer.addKeywordSearch(
-                            SpeechRecognitionTypesEnum.ALL_KEYWORDS,
-                            SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.ALL_KEYWORDS, locale)
-                    )
-
-                    // Include a search option for the find keyword context
-                    speechRecognizer.addGrammarSearch(
-                            SpeechRecognitionTypesEnum.FIND_KEYWORD,
-                            SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.FIND_KEYWORD, locale)
-                    )
-
-                    // Include a search option for the navigate keyword context
-                    speechRecognizer.addGrammarSearch(
-                            SpeechRecognitionTypesEnum.NAVIGATE_KEYWORD,
-                            SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.NAVIGATE_KEYWORD, locale)
-                    )
-
-                    // Include a search option for the test keyword context
-                    speechRecognizer.addNgramSearch(
-                            SpeechRecognitionTypesEnum.TEST_KEYWORD,
-                            SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.TEST_KEYWORD, locale)
-                    )
-
-                    if (speechRecognizer != null) {
-                        mSpeechRecognizer = speechRecognizer
-                        mSpeechRecognizer!!.addListener(RecognitionListenerImplementation())
-                        mIsInitialized = true
-                        EventBus.publish(
-                                SpeechToTextInitializationEvent(true)
-                        )
-                    } else {
-                        EventBus.publish(
-                                SpeechToTextInitializationEvent(false)
-                        )
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "SpeechToTextService.init() failed!", e)
-                    EventBus.publish(
-                            SpeechToTextInitializationEvent(false)
-                    )
-                }
-        ).observeOn(Schedulers.io())
+        Completable.create {
+            initializeTextToSpeechComponent()
+            it.onComplete()
+        }.doOnComplete {
+            mIsInit = true
+            mInitState.onNext(Unit)
+        }.doOnError {
+            Log.e(TAG, "SpeechToTextService.init() failed!", it)
+            mInitState.onError(it)
+        }.observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
+                .subscribe()
     }
 
-    override fun recognizeSpeech(@SpeechRecognitionTypesEnumAnnotation speechRecognitionType: String) {
-        if (mIsInitialized && !mIsActive) {
-            mIsActive = true
-            EventBus.publish(
-                    TextToSpeechConvertEvent(mContext!!.getString(R.string.speech_recognition_feedback_start_of_module))
-            )
-            mSpeechRecognizer?.startListening(speechRecognitionType, Constants.SPEECH_TO_TEXT_TIMEOUT)
+    override fun getInitState(): Observable<Unit> {
+        return mInitState
+    }
+
+    override fun recognizeSpeech(@SpeechRecognitionTypesAnnotation speechRecognitionType: String): Observable<Unit> {
+        if (!mIsInit || mIsActive) {
+            return Observable.error(Throwable("ERROR"))
         }
+
+        mIsActive = true
+        mSpeechRecognitionSubject = PublishSubject.create<Unit>()
+
+        convertTextToSpeech(
+                mContext.getString(R.string.speech_recognition_feedback_start_of_module)
+        )
+        mSpeechRecognizer?.startListening(speechRecognitionType, Constants.SPEECH_TO_TEXT_TIMEOUT)
+
+        return mSpeechRecognitionSubject
     }
 
     override fun release() {
         mSpeechRecognizer?.cancel()
         mSpeechRecognizer?.shutdown()
-        mContext = null
+        mInitState.onComplete()
+    }
+
+    private fun initializeTextToSpeechComponent() {
+        val assets = Assets(mContext)
+        val assetDir = assets.syncAssets()
+        // Adjust the language according to the locale
+        val locale = Locale.US
+
+        // Initialize the recognizer, set the acoustic model and the dictionary
+        val speechRecognizer = SpeechRecognizerSetup.defaultSetup()
+                .setAcousticModel(
+                        SpeechRecognitionUtil.getAcousticModel(assetDir, locale)
+                )
+                .setDictionary(
+                        SpeechRecognitionUtil.getDictionary(assetDir, locale)
+                )
+                .recognizer
+
+        // Include a search option for the keywords
+        speechRecognizer.addKeywordSearch(
+                SpeechRecognitionTypesEnum.ALL_KEYWORDS,
+                SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.ALL_KEYWORDS, locale)
+        )
+
+        // Include a search option for the find keyword context
+        speechRecognizer.addGrammarSearch(
+                SpeechRecognitionTypesEnum.FIND_KEYWORD,
+                SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.FIND_KEYWORD, locale)
+        )
+
+        // Include a search option for the navigate keyword context
+        speechRecognizer.addGrammarSearch(
+                SpeechRecognitionTypesEnum.NAVIGATE_KEYWORD,
+                SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.NAVIGATE_KEYWORD, locale)
+        )
+
+        // Include a search option for the test keyword context
+        speechRecognizer.addNgramSearch(
+                SpeechRecognitionTypesEnum.TEST_KEYWORD,
+                SpeechRecognitionUtil.getAssetsForKeyword(assetDir, SpeechRecognitionTypesEnum.TEST_KEYWORD, locale)
+        )
+
+        if (speechRecognizer != null) {
+            mSpeechRecognizer = speechRecognizer
+            mSpeechRecognizer!!.addListener(RecognitionListenerImplementation())
+        } else {
+            throw Throwable("ERROR")
+        }
+    }
+
+    private fun convertTextToSpeech(message: String) {
+        mTextToSpeechService.convertTextToSpeech(
+                message
+        ).doOnError {
+            mSpeechRecognitionSubject.onError(it)
+        }.subscribe()
+    }
+
+    private fun stopSpeechRecognitionObservableStream() {
+        mSpeechRecognitionSubject.onNext(Unit)
+        mSpeechRecognitionSubject.onComplete()
     }
 
     private inner class RecognitionListenerImplementation : RecognitionListener {
@@ -160,11 +191,10 @@ class SpeechToTextService(private var mContext: Context?) : ISpeechToTextService
             mIsActive = false
 
             if (hypothesis == null) {
-                EventBus.publish(
-                        TextToSpeechConvertEvent(
-                                mContext!!.getString(R.string.speech_recognition_feedback_no_result)
-                        )
+                convertTextToSpeech(
+                        mContext.getString(R.string.speech_recognition_feedback_no_result)
                 )
+                stopSpeechRecognitionObservableStream()
 
                 return
             }
@@ -172,29 +202,25 @@ class SpeechToTextService(private var mContext: Context?) : ISpeechToTextService
             if (SpeechRecognitionTypesEnum.ALL_KEYWORDS == mSpeechRecognizer?.searchName) {
                 if (mKeywordContainer[hypothesis.hypstr] != null) {
                     mIsActive = true
-                    EventBus.publish(
-                            TextToSpeechConvertEvent(
-                                    mContext!!.getString(R.string.speech_recognition_feedback_recognized_keyword)
-                            )
+                    convertTextToSpeech(
+                            mContext.getString(R.string.speech_recognition_feedback_recognized_keyword)
                     )
                     mSpeechRecognizer?.startListening(
                             mKeywordContainer[hypothesis.hypstr],
                             Constants.SPEECH_TO_TEXT_TIMEOUT
                     )
                 } else {
-                    EventBus.publish(
-                            TextToSpeechConvertEvent(
-                                    mContext!!.getString(R.string.speech_recognition_feedback_no_result)
-                            )
+                    convertTextToSpeech(
+                            mContext.getString(R.string.speech_recognition_feedback_no_result)
                     )
+                    stopSpeechRecognitionObservableStream()
                 }
             } else {
                 // In the next version, invoke the appropriate service which handles the input command
-                EventBus.publish(
-                        TextToSpeechConvertEvent(
-                                hypothesis.hypstr
-                        )
+                convertTextToSpeech(
+                        hypothesis.hypstr
                 )
+                stopSpeechRecognitionObservableStream()
             }
         }
 
@@ -206,6 +232,7 @@ class SpeechToTextService(private var mContext: Context?) : ISpeechToTextService
         override fun onError(e: Exception) {
             Log.e(TAG, "SpeechToTextService.onError()", e)
             mIsActive = false
+            mSpeechRecognitionSubject.onError(e)
         }
 
         /**
