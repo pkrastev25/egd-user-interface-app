@@ -3,19 +3,17 @@ package com.egd.userinterface.services
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import com.egd.userinterface.R
 import com.egd.userinterface.services.interfaces.ITextToSpeechService
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import java.util.*
 
 /**
- * Singleton, used to manage the text to speech functionality. Internally
- * it uses [TextToSpeech] to realize the functionality.
- *
  * @author Petar Krastev
- * @since 28.10.2017
  */
 class TextToSpeechService(
         context: Context,
@@ -24,6 +22,7 @@ class TextToSpeechService(
         speechRate: Float
 ) : ITextToSpeechService {
 
+    private val mContext = context.applicationContext
     private var mTextToSpeech: TextToSpeech? = null
     private var mIsInit = false
     private val mInitState = BehaviorSubject.create<Unit>()
@@ -32,22 +31,32 @@ class TextToSpeechService(
         Completable.create {
             mTextToSpeech = TextToSpeech(context, TextToSpeech.OnInitListener { state ->
                 if (state == TextToSpeech.SUCCESS) {
-                    mTextToSpeech!!.language = language
-                    mTextToSpeech!!.setPitch(pitch)
-                    mTextToSpeech!!.setSpeechRate(speechRate)
+                    mTextToSpeech?.let {
+                        it.language = language
+                        it.setPitch(pitch)
+                        it.setSpeechRate(speechRate)
+                    }
                     it.onComplete()
                 } else {
-                    Log.e(TAG, "TextToSpeech.OnInitListener() failed!")
-                    it.onError(Throwable("ERROR"))
+                    Log.e(TAG, "TextToSpeechService init failed!")
+                    it.onError(
+                            Throwable(
+                                    mContext.getString(R.string.text_to_speech_error_init)
+                            )
+                    )
                 }
             })
-        }.doOnComplete {
-            mIsInit = true
-            mInitState.onNext(Unit)
-        }.doOnError {
-            mInitState.onError(it)
-        }.observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
-                .subscribe()
+        }.observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(
+                        onError = {
+                            mInitState.onError(it)
+                        },
+                        onComplete = {
+                            mIsInit = true
+                            mInitState.onNext(Unit)
+                        }
+                )
     }
 
     override fun getInitState(): Observable<Unit> {
@@ -57,7 +66,11 @@ class TextToSpeechService(
     override fun convertTextToSpeech(textToBeConverted: String): Observable<Unit> {
         return Observable.create {
             if (!mIsInit) {
-                it.onError(Throwable("ERROR"))
+                it.onError(
+                        Throwable(
+                                mContext.getString(R.string.text_to_speech_error)
+                        )
+                )
             }
 
             val result = mTextToSpeech?.speak(textToBeConverted, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID)
@@ -65,8 +78,12 @@ class TextToSpeechService(
             if (result == TextToSpeech.SUCCESS) {
                 it.onComplete()
             } else {
-                Log.e(TAG, "TextToSpeech.convertTextToSpeech() failed!")
-                it.onError(Throwable("ERROR"))
+                Log.e(TAG, "convertTextToSpeech failed!")
+                it.onError(
+                        Throwable(
+                                mContext.getString(R.string.text_to_speech_error)
+                        )
+                )
             }
         }
     }
@@ -80,9 +97,6 @@ class TextToSpeechService(
 
         private val TAG = TextToSpeechService::class.java.simpleName
 
-        /**
-         * Unique identifier, used only by [TextToSpeechService.convertTextToSpeech].
-         */
         private const val UTTERANCE_ID = "UTTERANCE_ID"
     }
 }

@@ -11,6 +11,9 @@ import com.egd.userinterface.utils.PermissionsUtil
 import com.egd.userinterface.views.menu.MenuActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
+/**
+ * @author Petar Krastev
+ */
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

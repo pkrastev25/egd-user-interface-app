@@ -4,15 +4,20 @@ import com.egd.userinterface.views.menu.MenuViewState
 import com.hannesdorfmann.mosby3.mvp.MvpView
 import io.reactivex.Observable
 
+/**
+ * @author Petar Krastev
+ */
 interface IMenuActivity : MvpView {
 
-    fun onPreviousMenuButtonIntent(): Observable<Unit>
+    fun menuButtonInitStateIntent(): Observable<Unit>
 
-    fun onNextMenuButtonIntent(): Observable<Unit>
+    fun previousMenuButtonIntent(): Observable<Unit>
 
-    fun onConfirmMenuButtonIntent(): Observable<Unit>
+    fun nextMenuButtonIntent(): Observable<Unit>
 
-    fun onBackMenuButtonIntent(): Observable<Unit>
+    fun confirmMenuButtonIntent(): Observable<Unit>
+
+    fun backMenuButtonIntent(): Observable<Unit>
 
     fun render(state: MenuViewState)
 }

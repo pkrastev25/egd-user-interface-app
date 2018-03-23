@@ -1,5 +1,8 @@
 package com.egd.userinterface.views.menu
 
+/**
+ * @author Petar Krastev
+ */
 sealed class MenuViewState {
 
     data class InitState(

@@ -1,55 +1,10 @@
 <resources>
-    <string name="app_name">UserInterface</string>
-
-    <!-- region TEXT TO SPEECH -->
-
-    <string name="text_to_speech_initialization_of_module">The text to speech module is initialized!</string>
-
-    <!-- endregion TEXT TO SPEECH -->
-
-    <!-- region SPEECH RECOGNITION -->
-
-    <!-- Represents the words stored inside all-keywords.list inside the assets folder -->
-    <string name="speech_recognition_keyword_find">find</string>
-    <string name="speech_recognition_keyword_navigate">navigate</string>
-    <string name="speech_recognition_keyword_test">test</string>
-
-    <!-- Generic feedback from the speech recognition -->
-    <string name="speech_recognition_feedback_initialization_of_module">The speech recognition module is initialized!</string>
-    <string name="speech_recognition_feedback_no_result">I understood nothing. Try again!</string>
-    <string name="speech_recognition_feedback_start_of_module">How can I help you?</string>
-    <string name="speech_recognition_feedback_recognized_keyword">Yes?</string>
-
-    <!-- endregion SPEECH RECOGNITION region -->
-
-    <!-- region LED -->
-
-    <string name="led_feedback_on">LEDs are ON!</string>
-    <string name="led_feedback_off">LEDs are OFF!</string>
-
-    <!-- endregion LED -->
-
-    <!-- region MOTOR -->
-
-    <string name="motor_feedback_on">Motor is ON!</string>
-    <string name="motor_feedback_off">Motor is OFF!</string>
-
-    <!-- endregion MOTOR -->
-
-    <!-- region ERROR HANDLING -->
-
-    <string name="error_handling_occurred_error">An internal error has occurred!</string>
-
-    <!-- endregion ERROR HANDLING -->
+    <string name="app_name">EGD User Interface</string>
 
     <string name="view_permissions_warning_message">This application requires certain permissions to function. Please, grant them!</string>
     <string name="view_initialization_message">The application is initializing. Please wait…</string>
     <string name="view_initialization_error_message">The application components could not initialize. Please, restart the app!</string>
-
-    <string name="menu_back_button">Back</string>
-    <string name="menu_previous_button">Previous</string>
-    <string name="menu_next_button">Next</string>
-    <string name="menu_confirm_button">Confirm</string>
+    <string name="view_iot_menu">This is the IOT version of the application. It is not meant to provide interactions through a view.</string>
 
     <string name="menu_state_speech_recognition_start">Start speech recognition</string>
     <string name="menu_state_external_led_options">External LED options</string>
@@ -59,6 +14,32 @@
     <string name="menu_state_external_motor_options_start_motor">Start motor</string>
     <string name="menu_state_external_motor_options_stop_motor">Stop motor</string>
 
+    <string name="button_back">Back</string>
+    <string name="button_previous">Previous</string>
+    <string name="button_next">Next</string>
+    <string name="button_confirm">Confirm</string>
     <string name="button_request_permissions">Request permissions</string>
     <string name="button_close_application">Close application</string>
+
+    <string name="text_to_speech_error_init">The text to speech module failed to initialize.</string>
+    <string name="text_to_speech_error">An error has occurred with the text to speech functionality.</string>
+
+    <string name="speech_recognition_keyword_find">find</string>
+    <string name="speech_recognition_keyword_navigate">navigate</string>
+    <string name="speech_recognition_keyword_test">test</string>
+    <string name="speech_recognition_feedback_no_result">I understood nothing. Try again!</string>
+    <string name="speech_recognition_feedback_start">How can I help you?</string>
+    <string name="speech_recognition_feedback_recognized_keyword">Yes?</string>
+    <string name="speech_recognition_error_init">The speech recognition module failed to initialize.</string>
+    <string name="speech_recognition_error">An error has occurred with the speech recognition process.</string>
+
+    <string name="external_led_feedback_on">LEDs are on.</string>
+    <string name="external_led_feedback_off">LEDs are off.</string>
+    <string name="external_led_error_missing">There are no external LEDs connected to this device.</string>
+
+    <string name="external_motor_feedback_started">The motor is started.</string>
+    <string name="external_motor_feedback_stopped">The motor is stopped.</string>
+    <string name="external_motor_error_missing">There is no external motor connected to this device.</string>
+
+    <string name="gpio_error_io">A critical IO error has occurred.</string>
 </resources>

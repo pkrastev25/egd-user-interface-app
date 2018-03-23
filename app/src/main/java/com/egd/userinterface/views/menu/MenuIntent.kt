@@ -1,7 +1,7 @@
 package com.egd.userinterface.views.menu
 
 /**
- * Created by User on 28.2.2018 г..
+ * @author Petar Krastev
  */
 sealed class MenuIntent {
 
@@ -30,4 +30,12 @@ sealed class MenuIntent {
     object BackMenuButtonIntent : MenuIntent()
 
     object ConfirmMenuButtonIntent : MenuIntent()
+
+    data class ExternalDeviceInitErrorIntent(
+            val error: Throwable
+    ) : MenuIntent()
+
+    data class ExternalDeviceErrorIntent(
+            val error: Throwable
+    ) : MenuIntent()
 }

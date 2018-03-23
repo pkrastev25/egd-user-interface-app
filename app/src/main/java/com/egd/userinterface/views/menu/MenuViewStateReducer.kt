@@ -2,14 +2,16 @@ package com.egd.userinterface.views.menu
 
 import android.content.Context
 import com.egd.userinterface.R
-import com.egd.userinterface.bus.EventBus
-import com.egd.userinterface.bus.events.SpeechToTextConvertEvent
-import com.egd.userinterface.bus.events.TextToSpeechConvertEvent
+import com.egd.userinterface.buses.ReducerInteractorCommunicationBus
+import com.egd.userinterface.buses.events.ExternalLedToggleEvent
+import com.egd.userinterface.buses.events.ExternalMotorToggleEvent
+import com.egd.userinterface.buses.events.SpeechToTextConvertEvent
+import com.egd.userinterface.buses.events.TextToSpeechConvertEvent
 import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnum
 import com.egd.userinterface.views.menu.interfaces.IMenuViewStateReducer
 
 /**
- * Created by User on 27.2.2018 г..
+ * @author Petar Krastev
  */
 class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
 
@@ -26,9 +28,7 @@ class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
                 )
             }
             is MenuIntent.TextToSpeechInitErrorIntent -> {
-                reduceTextToSpeechInitErrorIntent(
-                        previousState
-                )
+                reduceTextToSpeechInitErrorIntent()
             }
             is MenuIntent.TextToSpeechConvertErrorIntent -> {
                 reduceTextToSpeechConvertErrorIntent(
@@ -41,9 +41,7 @@ class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
                 )
             }
             is MenuIntent.SpeechToTextInitErrorIntent -> {
-                reduceSpeechToTextInitErrorIntent(
-                        previousState
-                )
+                reduceSpeechToTextInitErrorIntent()
             }
             is MenuIntent.SpeechToTextStopConvertIntent -> {
                 reduceSpeechToTextStopConvertIntent(
@@ -75,6 +73,14 @@ class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
                         previousState
                 )
             }
+            is MenuIntent.ExternalDeviceInitErrorIntent -> {
+                reduceExternalDeviceInitErrorIntent()
+            }
+            is MenuIntent.ExternalDeviceErrorIntent -> {
+                reduceExternalDeviceErrorIntent(
+                        previousState, changes
+                )
+            }
         }
     }
 
@@ -100,15 +106,8 @@ class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
         }
     }
 
-    private fun reduceTextToSpeechInitErrorIntent(
-            previousState: MenuViewState
-    ): MenuViewState {
-        return when (previousState) {
-            is MenuViewState.InitState -> {
-                MenuViewState.InitErrorState
-            }
-            else -> previousState
-        }
+    private fun reduceTextToSpeechInitErrorIntent(): MenuViewState {
+        return MenuViewState.InitErrorState
     }
 
     private fun reduceTextToSpeechConvertErrorIntent(
@@ -177,15 +176,8 @@ class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
         }
     }
 
-    private fun reduceSpeechToTextInitErrorIntent(
-            previousState: MenuViewState
-    ): MenuViewState {
-        return when (previousState) {
-            is MenuViewState.InitState -> {
-                MenuViewState.InitErrorState
-            }
-            else -> previousState
-        }
+    private fun reduceSpeechToTextInitErrorIntent(): MenuViewState {
+        return MenuViewState.InitErrorState
     }
 
     private fun reduceSpeechToTextStopConvertIntent(
@@ -402,6 +394,22 @@ class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
                         stateMessage = stateMessage
                 )
             }
+            is MenuViewState.OptionExternalLedTurnLedOnState -> {
+                ReducerInteractorCommunicationBus.publish(
+                        ExternalLedToggleEvent(
+                                shouldTurnOn = true
+                        )
+                )
+                previousState
+            }
+            is MenuViewState.OptionExternalLedTurnLedOffState -> {
+                ReducerInteractorCommunicationBus.publish(
+                        ExternalLedToggleEvent(
+                                shouldTurnOn = true
+                        )
+                )
+                previousState
+            }
             is MenuViewState.OptionExternalMotorState -> {
                 val stateMessage = mContext.getString(R.string.menu_state_external_motor_options_start_motor)
 
@@ -410,8 +418,24 @@ class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
                         stateMessage = stateMessage
                 )
             }
+            is MenuViewState.OptionExternalMotorStartMotorState -> {
+                ReducerInteractorCommunicationBus.publish(
+                        ExternalMotorToggleEvent(
+                                shouldStart = true
+                        )
+                )
+                previousState
+            }
+            is MenuViewState.OptionExternalMotorStopMotorState -> {
+                ReducerInteractorCommunicationBus.publish(
+                        ExternalMotorToggleEvent(
+                                shouldStart = false
+                        )
+                )
+                previousState
+            }
             is MenuViewState.OptionSpeechRecognitionStartState -> {
-                EventBus.publish(
+                ReducerInteractorCommunicationBus.publish(
                         SpeechToTextConvertEvent(
                                 SpeechRecognitionTypesEnum.ALL_KEYWORDS
                         )
@@ -422,8 +446,41 @@ class MenuViewStateReducer(context: Context) : IMenuViewStateReducer {
         }
     }
 
+    private fun reduceExternalDeviceInitErrorIntent(): MenuViewState {
+        return MenuViewState.InitErrorState
+    }
+
+    private fun reduceExternalDeviceErrorIntent(
+            previousState: MenuViewState,
+            changes: MenuIntent.ExternalDeviceErrorIntent
+    ): MenuViewState {
+        return when (previousState) {
+            is MenuViewState.OptionExternalLedTurnLedOnState -> {
+                previousState.copy(
+                        error = changes.error
+                )
+            }
+            is MenuViewState.OptionExternalLedTurnLedOffState -> {
+                previousState.copy(
+                        error = changes.error
+                )
+            }
+            is MenuViewState.OptionExternalMotorStartMotorState -> {
+                previousState.copy(
+                        error = changes.error
+                )
+            }
+            is MenuViewState.OptionExternalMotorStopMotorState -> {
+                previousState.copy(
+                        error = changes.error
+                )
+            }
+            else -> previousState
+        }
+    }
+
     private fun publishTextToSpeechConvertEvent(stateMessage: String) {
-        EventBus.publish(
+        ReducerInteractorCommunicationBus.publish(
                 TextToSpeechConvertEvent(stateMessage)
         )
     }

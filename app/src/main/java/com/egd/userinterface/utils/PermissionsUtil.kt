@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 
 /**
- * Created by User on 25.2.2018 г..
+ * @author Petar Krastev
  */
 object PermissionsUtil {
 

@@ -4,11 +4,7 @@ import com.egd.userinterface.constants.annotations.SpeechRecognitionTypesAnnotat
 import io.reactivex.Observable
 
 /**
- * Abstraction for the controller responsible for managing the speech to text
- * functionality.
- *
  * @author Petar Krastev
- * @since 19.11.2017
  */
 interface ISpeechToTextService {
 

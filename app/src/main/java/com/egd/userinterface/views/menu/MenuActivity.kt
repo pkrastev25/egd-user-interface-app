@@ -4,6 +4,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.egd.userinterface.R
+import com.egd.userinterface.constants.Constants
+import com.egd.userinterface.interactors.ExternalLedInteractor
+import com.egd.userinterface.interactors.ExternalMotorInteractor
+import com.egd.userinterface.interactors.ExternalPowerSupplyInteractor
+import com.egd.userinterface.services.ExternalLedService
+import com.egd.userinterface.services.ExternalMotorService
+import com.egd.userinterface.services.ExternalPowerSupplyService
+import com.egd.userinterface.services.TextToSpeechService
 import com.egd.userinterface.views.menu.interfaces.IMenuActivity
 import com.hannesdorfmann.mosby3.mvi.MviActivity
 import com.jakewharton.rxbinding2.view.clicks
@@ -12,6 +20,9 @@ import kotlinx.android.synthetic.main.view_menu_init.*
 import kotlinx.android.synthetic.main.view_menu_init_error.*
 import kotlinx.android.synthetic.main.view_menu_options.*
 
+/**
+ * @author Petar Krastev
+ */
 class MenuActivity : MviActivity<IMenuActivity, MenuPresenter>(), IMenuActivity {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +31,31 @@ class MenuActivity : MviActivity<IMenuActivity, MenuPresenter>(), IMenuActivity 
     }
 
     override fun createPresenter(): MenuPresenter {
-        return MenuPresenter(applicationContext)
+        // TODO: Create using DI
+        val textToSpeechService = TextToSpeechService(
+                applicationContext,
+                Constants.TEXT_TO_SPEECH_DEFAULT_LANGUAGE,
+                Constants.TEXT_TO_SPEECH_DEFAULT_PITCH,
+                Constants.TEXT_TO_SPEECH_DEFAULT_SPEECH_RATE
+        )
+
+        return MenuPresenter(
+                context = applicationContext,
+                textToSpeechService = textToSpeechService,
+                externalLedInteractor = ExternalLedInteractor(
+                        ExternalLedService(
+                                context = applicationContext
+                        )
+                ),
+                externalMotorInteractor = ExternalMotorInteractor(
+                        ExternalMotorService(
+                                context = applicationContext
+                        )
+                ),
+                externalPowerSupplyInteractor = ExternalPowerSupplyInteractor(
+                        ExternalPowerSupplyService()
+                )
+        )
     }
 
     override fun render(state: MenuViewState) {
@@ -58,19 +93,24 @@ class MenuActivity : MviActivity<IMenuActivity, MenuPresenter>(), IMenuActivity 
         }
     }
 
-    override fun onPreviousMenuButtonIntent(): Observable<Unit> {
+    override fun menuButtonInitStateIntent(): Observable<Unit> {
+        // Nothing to initialize here...
+        return Observable.empty()
+    }
+
+    override fun previousMenuButtonIntent(): Observable<Unit> {
         return previous_menu_button.clicks()
     }
 
-    override fun onNextMenuButtonIntent(): Observable<Unit> {
+    override fun nextMenuButtonIntent(): Observable<Unit> {
         return next_menu_button.clicks()
     }
 
-    override fun onConfirmMenuButtonIntent(): Observable<Unit> {
+    override fun confirmMenuButtonIntent(): Observable<Unit> {
         return confirm_menu_button.clicks()
     }
 
-    override fun onBackMenuButtonIntent(): Observable<Unit> {
+    override fun backMenuButtonIntent(): Observable<Unit> {
         return back_menu_button.clicks()
     }
 

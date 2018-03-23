@@ -27,7 +27,7 @@
         <activity android:name="com.egd.userinterface.views.menu.MenuActivity">
         </activity>
 
-        <activity android:name="com.egd.userinterface.iot.views.menu.IotMenuActivity">
+        <activity android:name="com.egd.userinterface.views.menu.iot.IotMenuActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

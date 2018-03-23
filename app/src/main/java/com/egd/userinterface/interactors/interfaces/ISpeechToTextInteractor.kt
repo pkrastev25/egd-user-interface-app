@@ -4,13 +4,13 @@ import com.egd.userinterface.views.menu.MenuIntent
 import io.reactivex.Observable
 
 /**
- * Created by User on 11.3.2018 г..
+ * @author Petar Krastev
  */
 interface ISpeechToTextInteractor {
 
-    fun getSpeechToTextInitIntent(): Observable<MenuIntent>
+    fun getSpeechToTextInitStateIntent(): Observable<MenuIntent>
 
-    fun getSpeechToTextConvertIntent(): Observable<MenuIntent>
+    fun getSpeechToTextConvertStateIntent(): Observable<MenuIntent>
 
     fun release()
 }

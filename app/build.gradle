@@ -54,8 +54,8 @@ dependencies {
     // MVI
     implementation 'com.hannesdorfmann.mosby3:mvi:3.1.0'
 
-    // RxJava and RxAndroid
-    implementation "io.reactivex.rxjava2:rxjava:2.0.7"
+    // RxKotlin and RxAndroid
+    implementation "io.reactivex.rxjava2:rxkotlin:2.0.0"
     implementation "io.reactivex.rxjava2:rxandroid:2.0.0"
 
     // RxBinding

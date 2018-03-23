@@ -1,7 +1,7 @@
 package com.egd.userinterface.interactors
 
-import com.egd.userinterface.bus.EventBus
-import com.egd.userinterface.bus.events.SpeechToTextConvertEvent
+import com.egd.userinterface.buses.ReducerInteractorCommunicationBus
+import com.egd.userinterface.buses.events.SpeechToTextConvertEvent
 import com.egd.userinterface.interactors.interfaces.ISpeechToTextInteractor
 import com.egd.userinterface.services.interfaces.ISpeechToTextService
 import com.egd.userinterface.views.menu.MenuIntent
@@ -9,7 +9,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
- * Created by User on 27.2.2018 г..
+ * @author Petar Krastev
  */
 class SpeechToTextInteractor(
         speechToTextService: ISpeechToTextService
@@ -17,7 +17,7 @@ class SpeechToTextInteractor(
 
     private val mSpeechToTextService = speechToTextService
 
-    override fun getSpeechToTextInitIntent(): Observable<MenuIntent> {
+    override fun getSpeechToTextInitStateIntent(): Observable<MenuIntent> {
         return mSpeechToTextService.getInitState()
                 .map<MenuIntent> {
                     MenuIntent.SpeechToTextInitSuccessIntent
@@ -27,8 +27,8 @@ class SpeechToTextInteractor(
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun getSpeechToTextConvertIntent(): Observable<MenuIntent> {
-        return EventBus.listen(SpeechToTextConvertEvent::class.java)
+    override fun getSpeechToTextConvertStateIntent(): Observable<MenuIntent> {
+        return ReducerInteractorCommunicationBus.listen(SpeechToTextConvertEvent::class.java)
                 .switchMap {
                     mSpeechToTextService.recognizeSpeech(
                             it.speechRecognitionType
@@ -40,6 +40,7 @@ class SpeechToTextInteractor(
                             error = it
                     )
                 }
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
     override fun release() {

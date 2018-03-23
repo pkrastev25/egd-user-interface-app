@@ -1,7 +1,7 @@
 package com.egd.userinterface.interactors
 
-import com.egd.userinterface.bus.EventBus
-import com.egd.userinterface.bus.events.TextToSpeechConvertEvent
+import com.egd.userinterface.buses.ReducerInteractorCommunicationBus
+import com.egd.userinterface.buses.events.TextToSpeechConvertEvent
 import com.egd.userinterface.interactors.interfaces.ITextToSpeechInteractor
 import com.egd.userinterface.services.interfaces.ITextToSpeechService
 import com.egd.userinterface.views.menu.MenuIntent
@@ -9,7 +9,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
- * Created by User on 27.2.2018 г..
+ * @author Petar Krastev
  */
 class TextToSpeechInteractor(
         textToSpeechService: ITextToSpeechService
@@ -17,7 +17,7 @@ class TextToSpeechInteractor(
 
     private val mTextToSpeechService = textToSpeechService
 
-    override fun getTextToSpeechInitIntent(): Observable<MenuIntent> {
+    override fun getTextToSpeechInitStateIntent(): Observable<MenuIntent> {
         return mTextToSpeechService.getInitState()
                 .map<MenuIntent> {
                     MenuIntent.TextToSpeechInitSuccessIntent
@@ -28,19 +28,20 @@ class TextToSpeechInteractor(
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun getTextToSpeechConvertIntent(): Observable<MenuIntent> {
-        return EventBus.listen(TextToSpeechConvertEvent::class.java)
+    override fun getTextToSpeechConvertStateIntent(): Observable<MenuIntent> {
+        return ReducerInteractorCommunicationBus.listen(TextToSpeechConvertEvent::class.java)
                 .switchMap {
                     mTextToSpeechService.convertTextToSpeech(
                             it.textToBeConverted
                     )
-                }.flatMap {
-                    Observable.empty<MenuIntent>()
+                }.flatMap<MenuIntent> {
+                    Observable.empty()
                 }.onErrorReturn {
                     MenuIntent.TextToSpeechConvertErrorIntent(
                             error = it
                     )
                 }
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
     override fun release() {

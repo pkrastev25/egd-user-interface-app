@@ -4,7 +4,7 @@ import android.support.annotation.StringDef
 import com.egd.userinterface.constants.enums.SpeechRecognitionTypesEnum
 
 /**
- * Created by User on 3.3.2018 г..
+ * @author Petar Krastev
  */
 @Retention(AnnotationRetention.SOURCE)
 @StringDef(
