@@ -34,6 +34,14 @@ This aspect deals with a use case in which the user has lost the Electronic Guid
 * Speech recognition with a predefined context
 * Appropriate error handling
 
+## Dependencies
+
+* [Android Things](https://developer.android.com/things/index.html)
+* [MVI Mosby](https://github.com/sockeqwe/mosby)
+* [Pocketsphinx](https://cmusphinx.github.io/wiki/tutorialpocketsphinx/)
+* [RxKotlin](https://github.com/ReactiveX/RxKotlin)
+* [RXBinding](https://github.com/JakeWharton/RxBinding)
+
 ## License
 
    Copyright 2018 Petar Krastev
